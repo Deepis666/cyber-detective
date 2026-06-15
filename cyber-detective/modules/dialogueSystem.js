@@ -25,6 +25,9 @@ let _typewriterTimer = null;
 let _typewriterResolve = null;
 let _isTyping = false;
 
+// 角色名称映射（由外部注入）
+let _speakerNameMap = {};
+
 // ====================
 // 初始化
 // ====================
@@ -208,18 +211,18 @@ export function getHistory() {
 // ====================
 
 /**
- * 设置说话者名称
+ * 设置说话者名称（支持外部注入的角色名称映射）
  */
 function _setSpeakerName(speaker, emotion) {
-  const nameMap = {
+  const defaultNames = {
     'system': '系统',
     'detective': '你',
     'narration': '旁白',
     'ai_assistant': '赛博义眼'
   };
 
-  // 尝试从角色数据中获取名字（后续由外部注入）
-  const displayName = nameMap[speaker] || speaker || '???';
+  // Day2 已修复：优先使用外部注入的名称映射
+  const displayName = _speakerNameMap[speaker] || defaultNames[speaker] || speaker || '???';
 
   _elements.speakerName.textContent = displayName;
   _elements.speakerName.className = 'speaker-name';
@@ -305,31 +308,6 @@ function _waitForContinue() {
  * 设置角色名称映射（供外部注入角色名字）
  * @param {Object} map - { speakerId: displayName }
  */
-let _speakerNameMap = {};
-
 export function setSpeakerNameMap(map) {
   _speakerNameMap = { ..._speakerNameMap, ...map };
-}
-
-// 覆盖 _setSpeakerName 中的 nameMap 逻辑
-const _originalSetSpeakerName = _setSpeakerName;
-// 重新导出增强版
-export function _setSpeakerNameEnhanced(speaker, emotion) {
-  const defaultNames = {
-    'system': '系统',
-    'detective': '你',
-    'narration': '旁白',
-    'ai_assistant': '赛博义眼'
-  };
-
-  const displayName = _speakerNameMap[speaker] || defaultNames[speaker] || speaker || '???';
-
-  _elements.speakerName.textContent = displayName;
-  _elements.speakerName.className = 'speaker-name';
-
-  if (speaker === 'detective') {
-    _elements.speakerName.classList.add('detective');
-  } else if (speaker === 'system' || speaker === 'narration') {
-    _elements.speakerName.classList.add('system');
-  }
 }

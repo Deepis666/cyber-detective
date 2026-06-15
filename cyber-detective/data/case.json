@@ -94,7 +94,9 @@
         {
           "id": "hotspot_tool",
           "label": "检查工具架",
-          "type": "examine",
+          "type": "evidence",
+          "evidenceId": "evidence_006",
+          "evidenceName": "工具架缺失记录",
           "position": { "top": "20%", "left": "15%", "width": "80px", "height": "100px" },
           "once": true,
           "dialogues": [

@@ -61,6 +61,11 @@ async function init() {
     _loadingProgress++;
     updateLoadingBar();
 
+    // Day2: 将对话数据暴露到全局，供 sceneManager 审讯模块使用
+    window._dialoguesData = _dialoguesData;
+    window._caseData = _caseData;
+    window._charactersData = _charactersData;
+
     console.log('[main] 数据文件加载完成');
   } catch (e) {
     console.error('[main] 数据文件加载失败:', e);
