@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>霓虹公寓谋杀案 — 赛博朋克侦探叙事游戏</title>
+  <link rel="icon" type="image/svg+xml" href="/ui/favicon.svg" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div id="game-container">
+
+    <!-- 加载画面 -->
+    <div id="loading-screen" class="screen active">
+      <div class="loading-content">
+        <h1 class="glitch" data-text="NEON DETECTIVE">NEON DETECTIVE</h1>
+        <p class="loading-text">系统启动中<span class="blink">_</span></p>
+        <div class="loading-bar">
+          <div class="loading-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主菜单 -->
+    <div id="menu-screen" class="screen">
+      <div class="menu-content">
+        <h1 class="glitch" data-text="NEON DETECTIVE">NEON DETECTIVE</h1>
+        <p class="subtitle">赛博朋克侦探叙事游戏</p>
+        <div class="menu-buttons">
+          <button class="cyber-btn" data-action="new-game">新游戏</button>
+          <button class="cyber-btn" data-action="continue" disabled>继续游戏</button>
+        </div>
+        <p class="version-text">v1.0.0 | 腾讯云黑客松</p>
+      </div>
+    </div>
+
+    <!-- 案件简报 -->
+    <div id="briefing-screen" class="screen">
+      <div class="briefing-content">
+        <div class="briefing-header">
+          <span class="briefing-label">CASE FILE</span>
+          <h2 id="case-title" class="neon-text"></h2>
+        </div>
+        <div class="briefing-body">
+          <div id="briefing-setting"></div>
+          <div id="briefing-victim"></div>
+        </div>
+        <div class="briefing-footer">
+          <button class="cyber-btn" data-action="start-investigation">开始调查</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 调查场景 -->
+    <div id="investigate-screen" class="screen">
+      <div class="scene-view">
+        <div id="scene-image" class="scene-bg"></div>
+        <div id="scene-hotspots" class="hotspot-layer"></div>
+      </div>
+      <!-- 顶部信息栏 -->
+      <div class="top-bar">
+        <div class="phase-label">调查阶段</div>
+        <button class="cyber-btn-sm" data-action="open-evidence">证据栏</button>
+        <button class="cyber-btn-sm" data-action="go-interrogation">开始审讯</button>
+      </div>
+    </div>
+
+    <!-- 审讯场景 -->
+    <div id="interrogation-screen" class="screen">
+      <div class="interrogation-layout">
+        <!-- 角色立绘 -->
+        <div class="character-panel">
+          <img id="character-portrait" class="character-img" src="" alt="嫌疑人" />
+          <div id="stress-bar-container" class="stress-bar-container">
+            <span class="stress-label">压力值</span>
+            <div class="stress-bar">
+              <div id="stress-bar-fill" class="stress-bar-fill"></div>
+            </div>
+            <span id="stress-value" class="stress-value">0</span>
+          </div>
+          <div id="emotion-tag" class="emotion-tag">冷静</div>
+        </div>
+        <!-- 审讯交互区 -->
+        <div class="interrogation-panel">
+          <div class="top-bar">
+            <div class="phase-label">审讯阶段</div>
+            <button class="cyber-btn-sm" data-action="open-evidence">证据栏</button>
+            <button class="cyber-btn-sm" data-action="back-investigate">返回调查</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 结局画面 -->
+    <div id="ending-screen" class="screen">
+      <div class="ending-content">
+        <h2 id="ending-title" class="neon-text"></h2>
+        <div id="ending-text" class="ending-text"></div>
+        <div id="ending-score" class="ending-score"></div>
+        <button class="cyber-btn" data-action="back-menu">返回主菜单</button>
+      </div>
+    </div>
+
+    <!-- 对话框（全局覆盖层） -->
+    <div id="dialogue-overlay" class="dialogue-overlay hidden">
+      <div class="dialogue-box">
+        <div id="speaker-name" class="speaker-name"></div>
+        <div id="dialogue-text" class="dialogue-text"></div>
+        <div id="dialogue-indicator" class="dialogue-indicator">▼</div>
+      </div>
+      <div id="options-container" class="options-container"></div>
+    </div>
+
+    <!-- 证据栏（全局覆盖层） -->
+    <div id="evidence-overlay" class="evidence-overlay hidden">
+      <div class="evidence-panel">
+        <div class="evidence-header">
+          <h3 class="neon-text">证据栏</h3>
+          <button class="cyber-btn-sm" data-action="close-evidence">关闭</button>
+        </div>
+        <div id="evidence-list" class="evidence-list"></div>
+        <div id="evidence-detail" class="evidence-detail hidden">
+          <h4 id="evidence-detail-name"></h4>
+          <p id="evidence-detail-desc"></p>
+          <div id="evidence-actions" class="evidence-actions">
+            <button class="cyber-btn-sm" data-action="combine-evidence">组合证据</button>
+            <button class="cyber-btn-sm" data-action="present-evidence">出示证据</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI 思考动画 -->
+    <div id="ai-thinking" class="ai-thinking hidden">
+      <div class="thinking-content">
+        <div class="thinking-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span>AI 正在思考</span>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="/main.js"></script>
+</body>
+</html>

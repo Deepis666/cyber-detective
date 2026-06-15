@@ -1,0 +1,143 @@
+{
+  "caseId": "case_001",
+  "title": "霓虹公寓谋杀案",
+  "setting": {
+    "time": "2087年",
+    "location": "新香港·下城区·霓虹公寓 404 室",
+    "background": "2087年，新香港下城区。霓虹灯映照着潮湿的巷道，义体改造已深入社会每个角落。死者陈老九是一名黑市义体医生，在霓虹公寓404室经营地下诊所。案发当晚，邻居听到一声闷响，随后一切归于沉寂。警方赶到时，陈老九已倒在自己的手术椅上，后脑义体接口处有明显的电磁灼烧痕迹。现场无强行闯入痕迹，门锁电子记录显示，案发时段仅有两人进出。"
+  },
+  "victim": {
+    "name": "陈老九",
+    "identity": "黑市义体医生",
+    "description": "60岁，曾是正规医院的神经外科医生，后因违规实验被吊销执照，转入地下。擅长神经接口植入与义体改造，在下城区有一定声望。据说掌握着不少客户的秘密数据。"
+  },
+  "suspects": ["suspect_001", "suspect_002"],
+  "scenes": {
+    "scene_body": {
+      "id": "scene_body",
+      "name": "手术台区域",
+      "description": "死者仰面躺在手术椅上，周围的手术器械散落一地。空气中弥漫着焦糊味和消毒水的刺鼻混合气息。手术灯还在亮着，把一切照得惨白。",
+      "bgImage": null,
+      "hotspots": [
+        {
+          "id": "hotspot_body",
+          "label": "检查尸体",
+          "type": "evidence",
+          "evidenceId": "evidence_001",
+          "evidenceName": "破损的神经接口",
+          "position": { "top": "25%", "left": "35%", "width": "120px", "height": "100px" },
+          "once": true,
+          "dialogues": [
+            { "speaker": "detective", "text": "死者后脑的植入接口...表面有明显的烧焦痕迹，像是遭到了定向电磁脉冲的攻击。", "type": "thought" },
+            { "speaker": "detective", "text": "这种攻击方式很精准，普通人做不到。凶器很可能是改装过的电磁脉冲设备。", "type": "thought" }
+          ]
+        },
+        {
+          "id": "hotspot_needle",
+          "label": "检查地上的注射器",
+          "type": "evidence",
+          "evidenceId": "evidence_002",
+          "evidenceName": "使用过的注射器",
+          "position": { "top": "55%", "left": "55%", "width": "80px", "height": "70px" },
+          "once": true,
+          "dialogues": [
+            { "speaker": "detective", "text": "注射器里还残留着淡蓝色的液体...这是标准的神经阻断剂，义体手术中常用的麻醉辅助药剂。", "type": "thought" },
+            { "speaker": "detective", "text": "等等，注射器的指纹被擦掉了。有人刻意隐藏了使用者的身份。", "type": "thought" }
+          ]
+        },
+        {
+          "id": "hotspot_floor",
+          "label": "检查地板痕迹",
+          "type": "examine",
+          "position": { "top": "65%", "left": "30%", "width": "100px", "height": "60px" },
+          "once": true,
+          "dialogues": [
+            { "speaker": "detective", "text": "地板上有细微的刮痕，像是有人拖拽过什么重物...又擦掉了大部分痕迹。", "type": "thought" },
+            { "speaker": "detective", "text": "凶手很谨慎，但不够彻底。", "type": "thought" }
+          ]
+        }
+      ]
+    },
+    "scene_desk": {
+      "id": "scene_desk",
+      "name": "工作台区域",
+      "description": "陈老九的工作台上摆满了各种义体零件和工具。一台老旧但改装过的终端机还亮着屏幕，桌角的碎纸篓里似乎有些东西。",
+      "bgImage": null,
+      "hotspots": [
+        {
+          "id": "hotspot_terminal",
+          "label": "检查终端机",
+          "type": "evidence",
+          "evidenceId": "evidence_003",
+          "evidenceName": "加密数据芯片",
+          "position": { "top": "30%", "left": "40%", "width": "100px", "height": "80px" },
+          "once": true,
+          "dialogues": [
+            { "speaker": "detective", "text": "终端机里插着一块数据芯片，内容被加密了。芯片上刻着一个编号——LXB-003。", "type": "thought" },
+            { "speaker": "detective", "text": "LXB...这个缩写，和林小北有关？", "type": "thought" }
+          ]
+        },
+        {
+          "id": "hotspot_trash",
+          "label": "翻找碎纸篓",
+          "type": "evidence",
+          "evidenceId": "evidence_004",
+          "evidenceName": "撕碎的合同",
+          "position": { "top": "60%", "left": "60%", "width": "70px", "height": "70px" },
+          "once": true,
+          "dialogues": [
+            { "speaker": "detective", "text": "碎纸篓里有被撕碎的文件...拼起来看看。", "type": "thought" },
+            { "speaker": "detective", "text": "这是一份义体改造实验的合同，甲方签名是赵明月，项目代号'涅槃'。实验内容涉及非法的意识覆盖技术。", "type": "thought" },
+            { "speaker": "detective", "text": "陈老九竟然参与这种禁忌实验...这是他杀人的理由，还是他被杀的原因？", "type": "thought" }
+          ]
+        },
+        {
+          "id": "hotspot_tool",
+          "label": "检查工具架",
+          "type": "examine",
+          "position": { "top": "20%", "left": "15%", "width": "80px", "height": "100px" },
+          "once": true,
+          "dialogues": [
+            { "speaker": "detective", "text": "工具架上少了一把电磁脉冲焊接器...如果被改装成武器，足以烧毁神经接口。", "type": "thought" },
+            { "speaker": "detective", "text": "这很可能就是凶器。谁会拿走它？", "type": "thought" }
+          ]
+        },
+        {
+          "id": "hotspot_move_body",
+          "label": "前往手术台区域",
+          "type": "move",
+          "targetScene": "scene_body",
+          "position": { "top": "80%", "left": "20%", "width": "120px", "height": "50px" },
+          "dialogues": []
+        }
+      ]
+    }
+  },
+  "truth": {
+    "killerId": "suspect_001",
+    "motive": "林小北发现陈老九打算将非法义体实验的数据出售给第三方，这不仅会让林小北作为助手身败名裂，还可能让他成为实验事故的替罪羊。林小北在争执中用改装电磁脉冲注射器击杀了陈老九。",
+    "weapon": "改装电磁脉冲注射器",
+    "keyEvidence": ["evidence_003", "evidence_005"],
+    "timeline": "案发当晚21:00，林小北以加班为由返回诊所，与陈老九发生争执。21:15，林小北用事先改装好的电磁脉冲注射器攻击了陈老九的神经接口，导致脑干功能瞬间停止。随后林小北擦除了注射器上的指纹，伪造了现场。21:30离开。"
+  },
+  "endings": {
+    "ending_good": {
+      "condition": "score >= 80",
+      "title": "真相大白",
+      "titleEn": "TRUTH REVEALED",
+      "description": "你成功揭示了林小北的罪行，还原了完整的犯罪链条。正义在霓虹灯下得以伸张。"
+    },
+    "ending_normal": {
+      "condition": "score >= 40",
+      "title": "疑案悬置",
+      "titleEn": "COLD CASE",
+      "description": "你找到了部分线索，但证据链不够完整。案件被暂时搁置，真相仍藏在霓虹灯的阴影中。"
+    },
+    "ending_bad": {
+      "condition": "score < 40",
+      "title": "错判冤案",
+      "titleEn": "WRONGFUL CONVICTION",
+      "description": "关键证据的缺失导致误判。无辜者蒙冤，真凶在暗处露出微笑。"
+    }
+  }
+}

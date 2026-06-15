@@ -1,0 +1,68 @@
+{
+  "evidence": [
+    {
+      "id": "evidence_001",
+      "name": "破损的神经接口",
+      "icon": "🔌",
+      "description": "从死者后脑取出的植入芯片，表面有明显的电磁灼烧痕迹。攻击极为精准，直接命中了脑干控制模块。这种精度需要专业的医学知识或军方级别的瞄准系统。",
+      "type": "physical",
+      "obtainedFrom": "scene_body",
+      "canCombineWith": ["evidence_002", "evidence_005"],
+      "relatedTo": ["suspect_001"]
+    },
+    {
+      "id": "evidence_002",
+      "name": "使用过的注射器",
+      "icon": "💉",
+      "description": "手术台旁发现的注射器，残留神经阻断剂。指纹被仔细擦除。注射器口径与死者接口的辅助注入口完全匹配——凶手先用阻断剂让死者失去意识，再用脉冲攻击确保致命。",
+      "type": "physical",
+      "obtainedFrom": "scene_body",
+      "canCombineWith": ["evidence_001", "evidence_003"],
+      "relatedTo": ["suspect_001"]
+    },
+    {
+      "id": "evidence_003",
+      "name": "加密数据芯片",
+      "icon": "💾",
+      "description": "从终端机中取出的数据芯片，刻有编号LXB-003。LXB与林小北的拼音缩写一致。芯片内容加密，但元数据显示与'涅槃'项目相关，创建时间横跨最近六个月。",
+      "type": "digital",
+      "obtainedFrom": "scene_desk",
+      "canCombineWith": ["evidence_002", "evidence_004", "evidence_005"],
+      "relatedTo": ["suspect_001"]
+    },
+    {
+      "id": "evidence_004",
+      "name": "撕碎的合同",
+      "icon": "📄",
+      "description": "从碎纸篓中拼凑出的合同文件。甲方签名为赵明月，项目代号'涅槃'。实验内容涉及意识覆盖技术——这是联邦明令禁止的研究方向。陈老九作为技术提供方签字。",
+      "type": "document",
+      "obtainedFrom": "scene_desk",
+      "canCombineWith": ["evidence_003"],
+      "relatedTo": ["suspect_002"]
+    },
+    {
+      "id": "evidence_005",
+      "name": "林小北的日志片段",
+      "icon": "📝",
+      "description": "从数据芯片解密出的个人日志。记录了林小北对师傅出售实验数据的恐惧和愤怒：'如果那些数据流出去，他们会让我顶罪。我只是助手，但所有的操作记录都有我的编号。我不能让这种事发生。'",
+      "type": "digital",
+      "obtainedFrom": "combine",
+      "canCombineWith": ["evidence_001"],
+      "relatedTo": ["suspect_001"],
+      "unlockedBy": {
+        "evidence_001": true,
+        "evidence_003": true
+      }
+    },
+    {
+      "id": "evidence_006",
+      "name": "工具架缺失记录",
+      "icon": "🔧",
+      "description": "工作台工具架上缺少的电磁脉冲焊接器。如果被改装为定向脉冲设备，可以产生与死者伤口完全一致的损伤。只有熟悉这些工具的人才知道如何改装。",
+      "type": "physical",
+      "obtainedFrom": "scene_desk",
+      "canCombineWith": ["evidence_001"],
+      "relatedTo": ["suspect_001"]
+    }
+  ]
+}
