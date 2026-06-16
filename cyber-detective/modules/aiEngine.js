@@ -38,20 +38,24 @@ const PRESET_RESPONSES = {
       ],
       broken: [
         { response: "好...好吧。我承认芯片是我的。但我没有杀师傅！我只是...我只是想保护自己。那些数据如果流出，我会变成替罪羊...", emotion: "broken", stressDelta: -5, hasContradiction: true, newClue: "林小北害怕成为替罪羊" },
-        { response: "我确实在诊所里...我看到了师傅在联系买家，他要卖掉涅槃项目的数据。我求他不要这么做，但他根本不听...", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "陈老九意图出售涅槃项目数据" }
+        { response: "我确实在诊所里...我看到了师傅在联系买家，他要卖掉涅槃项目的数据。我求他不要这么做，但他根本不听...", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "陈老九意图出售涅槃项目数据" },
+        { response: "那晚...那晚他跟我说要把我从实验记录里抹掉。三年了，我帮他做了所有的事，他说抹就抹？我的义体里还留着他写的代码...我只是一时...", emotion: "broken", stressDelta: -8, hasContradiction: true, newClue: "林小北因被威胁而失控" }
       ]
     },
     suspect_002: {
       calm: [
         { response: "我是一名企业高管，我的行程都有记录。那晚我在锐义科技总部加班，监控系统可以作证。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
-        { response: "陈医生只是我偶尔光顾的义体维护师。你知道，企业级别的义体需要定期保养。仅此而已。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null }
+        { response: "陈医生只是我偶尔光顾的义体维护师。你知道，企业级别的义体需要定期保养。仅此而已。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
+        { response: "你可以去查我的所有通讯记录和财务流水。我和陈老九之间没有任何超出正常医患关系的往来。锐义科技不需要通过非法手段获取技术。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null }
       ],
       nervous: [
         { response: "涅槃？我不...我不知道你在说什么。那只是个概念代号，不是真实的项目！", emotion: "nervous", stressDelta: 10, hasContradiction: true, newClue: "赵明月否认涅槃项目" },
-        { response: "那份合同...一定是伪造的！你凭什么认为那上面我的签名是真的？", emotion: "nervous", stressDelta: 15, hasContradiction: true, newClue: null }
+        { response: "那份合同...一定是伪造的！你凭什么认为那上面我的签名是真的？", emotion: "nervous", stressDelta: 15, hasContradiction: true, newClue: null },
+        { response: "即使我资助过某些...实验研究，那也是合法的企业研发行为。你把黑市医生和企业投资混为一谈，这是诽谤。", emotion: "nervous", stressDelta: 8, hasContradiction: true, newClue: null }
       ],
       broken: [
-        { response: "好吧，涅槃是我的项目。但陈老九的死和我没有关系！我只是出资方，动手的事从来不是我做的！你们应该去查他的助手——林小北！", emotion: "broken", stressDelta: -5, hasContradiction: true, newClue: "赵明月承认涅槃项目存在" }
+        { response: "好吧，涅槃是我的项目。但陈老九的死和我没有关系！我只是出资方，动手的事从来不是我做的！你们应该去查他的助手——林小北！", emotion: "broken", stressDelta: -5, hasContradiction: true, newClue: "赵明月承认涅槃项目存在" },
+        { response: "我承认我出钱让陈老九做意识覆盖实验。但我没让他死！他拿着实验数据来勒索我...我是说，他想要更多的资金。然后他就死了。这和我没关系。", emotion: "broken", stressDelta: -8, hasContradiction: true, newClue: "赵明月承认出资+勒索关系" }
       ]
     }
   },
@@ -59,6 +63,16 @@ const PRESET_RESPONSES = {
     irrelevant: {
       isRelevant: false,
       insight: "这两件证据之间似乎没有直接的逻辑关联。也许换一种组合方式会有新的发现。",
+      unlocksEvidence: null
+    },
+    relevant_chip_contract: {
+      isRelevant: true,
+      insight: "加密数据芯片（LXB-003）与撕碎的合同存在关键关联：芯片上的编号'LXB'与林小北名字缩写吻合，而合同中'涅槃'项目的实验日志可能就存储在这块芯片中。赵明月作为出资方的签名进一步证实了这条资金链——林小北执行实验，赵明月提供资源。",
+      unlocksEvidence: "evidence_005"
+    },
+    relevant_interface_welder: {
+      isRelevant: true,
+      insight: "破损的神经接口上的电磁灼烧痕迹，与工具架上缺失的电磁脉冲焊接器形成物理因果链——焊接器经过改装后可以定向释放高能脉冲，精确烧毁神经接口而不留下外部创伤。这正是陈老九的死因。而能够接触到这把工具的人，只有经常在诊所工作的内部人员。",
       unlocksEvidence: null
     }
   }
