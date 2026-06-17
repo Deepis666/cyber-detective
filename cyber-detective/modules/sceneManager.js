@@ -6,17 +6,25 @@
  * 场景数据从 data/ 目录加载。
  */
 
-import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState, addStress, addScore, getStress, getEmotion, setEnding, loadGame, resetState } from './gameState.js';
+import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState, addStress, addScore, getStress, getEmotion, setEnding, loadGame, resetState, setGamePhase, getGamePhase, startNewCase, recordCaseResult, checkHiddenCaseUnlock, getCurrentCaseIndex, getCasesResults, initSuspectStress, isAllMainCasesCompleted, getFinalEndingType } from './gameState.js';
 import { showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, showDialogueOverlay } from './dialogueSystem.js';
 import { getEvidenceData, presentEvidence as evidencePresent, combineEvidence as evidenceCombine, selectEvidence, getSelectedEvidence, clearSelectedEvidence, renderEvidenceBar } from './evidenceSystem.js';
-import { interrogateAI, investigateAI, isAPIAvailable } from './aiEngine.js';
+import { interrogateAI, investigateAI, isAPIAvailable, setAIEngineCaseContext } from './aiEngine.js';
 import { playBGM, playSFX } from './audioManager.js';
+import { initPlotManager, getPlotData, getCurrentHubDialogue, getAllNewsFeed, getNextCaseIndex, shouldEnterFinalEnding, getFinalEnding, evaluateBranch, getHubDialogue, getNewsFeed } from './plotManager.js';
 
 // ====================
-// 场景数据缓存
+// 数据缓存
 // ====================
 let _scenesData = null;
-let _caseData = null;
+let _caseData = null;          // 当前激活的案件数据
+let _plotData = null;          // 主线剧情数据
+let _caseLoader = null;        // 案件数据加载器（由 main.js 注入）
+const _casesCache = {};        // 案件数据缓存 { caseId: caseData }
+
+// 案件文件名映射
+const CASE_FILES = ['case_001', 'case_002', 'case_003', 'case_004'];
+const CASE_TITLES = ['霓虹公寓谋杀案', '数据深渊', '义体战争', '最后的真相'];
 
 // ====================
 // 当前场景热点
@@ -36,10 +44,24 @@ let _elements = {};
  * 初始化场景管理器
  * @param {Object} scenesData - 场景数据
  * @param {Object} caseData - 案件数据
+ * @param {Object} plotData - 主线剧情数据（可选，多案件扩展）
+ * @param {Function} caseLoader - 案件数据加载器 (caseId) => Promise<caseData>（可选）
  */
-export function initSceneManager(scenesData, caseData) {
+export function initSceneManager(scenesData, caseData, plotData = null, caseLoader = null) {
   _scenesData = scenesData;
   _caseData = caseData;
+  _plotData = plotData;
+  _caseLoader = caseLoader;
+
+  // 缓存初始案件
+  if (caseData?.caseId) {
+    _casesCache[caseData.caseId] = caseData;
+  }
+
+  // 初始化主线剧情管理器
+  if (plotData) {
+    initPlotManager(plotData);
+  }
 
   _elements = {
     loadingScreen: document.getElementById('loading-screen'),
@@ -47,7 +69,9 @@ export function initSceneManager(scenesData, caseData) {
     briefingScreen: document.getElementById('briefing-screen'),
     investigateScreen: document.getElementById('investigate-screen'),
     interrogationScreen: document.getElementById('interrogation-screen'),
+    hubScreen: document.getElementById('hub-screen'),
     endingScreen: document.getElementById('ending-screen'),
+    finalEndingScreen: document.getElementById('final-ending-screen'),
     sceneImage: document.getElementById('scene-image'),
     sceneHotspots: document.getElementById('scene-hotspots'),
     characterPortrait: document.getElementById('character-portrait'),
@@ -60,7 +84,7 @@ export function initSceneManager(scenesData, caseData) {
   };
 
   _bindGlobalActions();
-  console.log('[sceneManager] 场景管理器初始化完成');
+  console.log('[sceneManager] 场景管理器初始化完成, plotData:', plotData ? '已加载' : '无');
 }
 
 // ====================
@@ -69,7 +93,7 @@ export function initSceneManager(scenesData, caseData) {
 
 /**
  * 切换到指定画面
- * @param {string} screenName - 'loading' | 'menu' | 'briefing' | 'investigate' | 'interrogation' | 'ending'
+ * @param {string} screenName - 'loading'|'menu'|'briefing'|'investigate'|'interrogation'|'hub'|'ending'|'final_ending'
  */
 export function switchScreen(screenName) {
   const screenMap = {
@@ -78,7 +102,9 @@ export function switchScreen(screenName) {
     'briefing': _elements.briefingScreen,
     'investigate': _elements.investigateScreen,
     'interrogation': _elements.interrogationScreen,
+    'hub': _elements.hubScreen,
     'ending': _elements.endingScreen,
+    'final_ending': _elements.finalEndingScreen,
   };
 
   // 隐藏所有画面
@@ -558,6 +584,34 @@ async function _handleEndCase() {
   }
 }
 
+// 多案件扩展：Hub 画面"开始调查"按钮处理
+async function _handleNextFromHub() {
+  const nextIdx = getNextCaseIndex();
+  if (nextIdx >= 0) {
+    await startCase(nextIdx);
+  } else {
+    // 全部案件完成，进入最终结局
+    await renderFinalEnding();
+  }
+}
+
+// 多案件扩展：回顾已结案件卷宗
+async function _handleReviewCases() {
+  const results = getCasesResults();
+  const completed = results.map((r, idx) => r ? `${CASE_TITLES[idx] || '案件' + (idx + 1)}：${r.ending === 'ending_good' ? '真相大白' : r.ending === 'ending_bad' ? '错判冤案' : '疑案悬置'}（评分 ${r.score}）` : null).filter(Boolean);
+
+  if (completed.length === 0) {
+    await showDialogue({ speaker: 'system', text: '尚无已结案的卷宗可供回顾。', type: 'normal' });
+    return;
+  }
+
+  await showDialogue({
+    speaker: 'ai_assistant',
+    text: `侦探，这是目前已结案件的卷宗摘要：\n${completed.join('\n')}`,
+    type: 'ai_generated'
+  });
+}
+
 // Day2/Day4：触发结局
 function _triggerEnding(endingId, score) {
   if (!_caseData?.endings?.[endingId]) return;
@@ -684,6 +738,7 @@ export function renderBriefing() {
  */
 export function renderEnding(ending) {
   setPhase('ending');
+  setGamePhase('ending');
   switchScreen('ending');
 
   // 播放结局BGM
@@ -698,14 +753,329 @@ export function renderEnding(ending) {
   if (scoreEl) scoreEl.textContent = `推理评分: ${ending.score || 0}`;
 }
 
+// ====================
+// 多案件扩展：Hub 画面 / 案件切换 / 最终结局
+// ====================
+
+/**
+ * 设置当前激活的案件数据（切换案件上下文）
+ * @param {Object} caseData
+ */
+export function setCaseData(caseData) {
+  _caseData = caseData;
+  _scenesData = caseData?.scenes || null;
+  if (caseData?.caseId) {
+    _casesCache[caseData.caseId] = caseData;
+  }
+
+  // 数据集成：将案件中的嫌疑人 ID 列表与 characters.json 合并为完整对象
+  if (caseData && Array.isArray(caseData.suspects) && typeof window._charactersData !== 'undefined') {
+    caseData.suspects = caseData.suspects.map(id => {
+      if (typeof id === 'object') return id; // 已是对象则跳过
+      const character = window._charactersData.characters?.find(c => c.id === id);
+      return character || { id, name: id };
+    });
+  }
+
+  // 同步更新 AI 引擎和证据系统的案件上下文
+  setAIEngineCaseContext(caseData);
+  console.log(`[sceneManager] 案件上下文已切换: ${caseData?.caseId}`);
+}
+
+/**
+ * 按需加载案件数据
+ * @param {number} caseIndex
+ * @returns {Promise<Object>}
+ */
+async function _loadCase(caseIndex) {
+  const caseId = CASE_FILES[caseIndex];
+  if (!caseId) throw new Error(`无效案件序号: ${caseIndex}`);
+
+  // 命中缓存
+  if (_casesCache[caseId]) return _casesCache[caseId];
+
+  // 通过注入的加载器或 fetch 加载
+  if (_caseLoader) {
+    const data = await _caseLoader(caseId);
+    _casesCache[caseId] = data;
+    return data;
+  }
+
+  // 默认 fetch
+  const res = await fetch(`/data/cases/${caseId}.json`);
+  if (!res.ok) throw new Error(`加载案件失败: ${caseId} (${res.status})`);
+  const data = await res.json();
+  _casesCache[caseId] = data;
+  return data;
+}
+
+/**
+ * 开始指定案件
+ * @param {number} caseIndex - 案件序号 0/1/2/3
+ */
+export async function startCase(caseIndex) {
+  try {
+    const caseData = await _loadCase(caseIndex);
+    setCaseData(caseData);
+
+    // 重置单案件状态（保留跨案件层）
+    startNewCase(caseIndex);
+
+    // 初始化嫌疑人压力值
+    if (Array.isArray(caseData.suspects)) {
+      // suspects 可能是 ID 数组或对象数组，统一提取 ID
+      const suspectIds = caseData.suspects.map(s => typeof s === 'string' ? s : s.id);
+      initSuspectStress(suspectIds);
+    }
+
+    setGamePhase('briefing');
+    renderBriefing();
+
+    // 播放调查BGM
+    playBGM('investigation');
+
+    console.log(`[sceneManager] 开始案件 ${caseIndex}: ${caseData.title}`);
+  } catch (e) {
+    console.error('[sceneManager] 加载案件失败:', e);
+    await showDialogue({
+      speaker: 'system',
+      text: `案件数据加载失败: ${e.message}。请稍后重试或联系开发人员。`,
+      type: 'normal'
+    });
+  }
+}
+
+/**
+ * 结案后返回事务所 Hub
+ * 记录案件结果、检查隐藏案件解锁、渲染 Hub 画面
+ */
+export async function endCaseAndReturnHub() {
+  const state = getState();
+  const caseIndex = getCurrentCaseIndex();
+
+  // 记录案件结果
+  const endingId = state.endingTriggered || _calculateEnding(state);
+  recordCaseResult({
+    caseId: _caseData?.caseId,
+    ending: endingId,
+    score: state.score || 0,
+    keyFlags: { ...state.flags }
+  });
+
+  // 检查是否解锁隐藏案件
+  checkHiddenCaseUnlock();
+
+  // 切换到 Hub 画面
+  setGamePhase('hub');
+  switchScreen('hub');
+  playBGM('menu'); // Hub 使用菜单BGM，待 C 组提供专属 bgm_hub
+
+  await _renderHub();
+
+  console.log('[sceneManager] 已返回事务所 Hub');
+}
+
+/**
+ * 渲染事务所 Hub 画面
+ * 根据 casesResults 显示 AI 对话、新闻简报、案件进度
+ */
+async function _renderHub() {
+  const state = getState();
+  const results = getCasesResults();
+
+  // 1. 渲染案件进度指示器
+  _renderCaseIndicator(results);
+
+  // 2. 渲染新闻简报
+  _renderNewsFeed(results);
+
+  // 3. 播放 AI 助手对话（基于最近结案结果）
+  const hubDialogues = getCurrentHubDialogue();
+  const aiDialogueEl = document.getElementById('hub-ai-dialogue');
+
+  if (hubDialogues && hubDialogues.length > 0) {
+    // 显示第一条对话作为静态文本，完整序列通过点击播放
+    if (aiDialogueEl) {
+      aiDialogueEl.textContent = hubDialogues[0].text || '';
+    }
+    // 异步播放完整对话序列
+    setTimeout(async () => {
+      if (hubDialogues.length > 1) {
+        await showDialogueSequence(hubDialogues);
+      }
+    }, 600);
+  } else {
+    // 占位对话（B 组未填充时的保底）
+    if (aiDialogueEl) {
+      const nextIdx = getNextCaseIndex();
+      if (nextIdx >= 0) {
+        aiDialogueEl.textContent = `侦探，新的案件卷宗已送达。${CASE_TITLES[nextIdx] || '下一个案件'}正等着你。`;
+      } else {
+        aiDialogueEl.textContent = '所有案件都已了结。是时候做个最终总结了。';
+      }
+    }
+  }
+
+  // 4. 配置"开始调查"按钮
+  const nextBtn = document.getElementById('hub-next-btn');
+  const nextIdx = getNextCaseIndex();
+  if (nextBtn) {
+    if (nextIdx >= 0) {
+      nextBtn.disabled = false;
+      nextBtn.textContent = nextIdx === 3 ? '进入隐藏案件' : '开始下一个案件';
+    } else {
+      // 全部案件完成，进入最终结局
+      nextBtn.disabled = false;
+      nextBtn.textContent = '查看最终结局';
+    }
+  }
+
+  // 5. 更新进度标签
+  const progressLabel = document.getElementById('hub-progress-label');
+  if (progressLabel) {
+    const completed = results.filter(r => r).length;
+    progressLabel.textContent = `案件进度：${completed} / 3 已结案`;
+  }
+}
+
+/**
+ * 渲染案件进度指示器
+ */
+function _renderCaseIndicator(results) {
+  const container = document.getElementById('hub-case-indicator');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  for (let i = 0; i < 3; i++) {
+    const result = results[i];
+    const node = document.createElement('div');
+    node.className = 'hub-case-node';
+
+    if (result) {
+      if (result.ending === 'ending_good') node.classList.add('good', 'active');
+      else if (result.ending === 'ending_bad') node.classList.add('bad', 'active');
+      else node.classList.add('normal', 'active');
+    }
+
+    const dot = document.createElement('div');
+    dot.className = 'hub-case-dot';
+    dot.textContent = result ? (result.ending === 'ending_good' ? '✓' : result.ending === 'ending_bad' ? '✗' : '—') : (i + 1);
+    node.appendChild(dot);
+
+    const label = document.createElement('div');
+    label.className = 'hub-case-label';
+    label.textContent = CASE_TITLES[i] || `案件${i + 1}`;
+    node.appendChild(label);
+
+    container.appendChild(node);
+
+    // 添加连接线（最后一个除外）
+    if (i < 2) {
+      const connector = document.createElement('div');
+      connector.className = 'hub-case-connector';
+      if (result) connector.classList.add('active');
+      container.appendChild(connector);
+    }
+  }
+
+  // 隐藏案件节点（如果已解锁）
+  if (getState().unlockedHiddenCase) {
+    const hiddenResult = results[3];
+    const connector = document.createElement('div');
+    connector.className = 'hub-case-connector active';
+    container.appendChild(connector);
+
+    const node = document.createElement('div');
+    node.className = 'hub-case-node' + (hiddenResult ? ' good active' : ' locked active');
+    const dot = document.createElement('div');
+    dot.className = 'hub-case-dot';
+    dot.textContent = hiddenResult ? '✓' : '?';
+    node.appendChild(dot);
+    const label = document.createElement('div');
+    label.className = 'hub-case-label';
+    label.textContent = '隐藏案件';
+    node.appendChild(label);
+    container.appendChild(node);
+  }
+}
+
+/**
+ * 渲染新闻简报
+ */
+function _renderNewsFeed(results) {
+  const listEl = document.getElementById('hub-news-list');
+  if (!listEl) return;
+
+  listEl.innerHTML = '';
+
+  // 收集所有已结案件的新闻
+  const allNews = [];
+  results.forEach((r, idx) => {
+    if (r) {
+      const news = getNewsFeed(idx);
+      allNews.push(...news);
+    }
+  });
+
+  if (allNews.length === 0) {
+    // 保底新闻
+    listEl.innerHTML = `
+      <div class="hub-news-item" style="animation-delay: 0.1s; opacity:1;">
+        <div class="hub-news-headline">新香港下城区夜间发生义体医生命案，警方已介入调查。</div>
+        <div class="hub-news-meta"><span>新香港晨报</span><span>2087.11.16</span></div>
+      </div>`;
+    return;
+  }
+
+  allNews.forEach((news, idx) => {
+    const item = document.createElement('div');
+    item.className = 'hub-news-item';
+    item.style.animationDelay = `${0.1 * (idx + 1)}s`;
+    item.innerHTML = `
+      <div class="hub-news-headline">${news.headline}</div>
+      <div class="hub-news-meta">
+        <span>${news.source || '未知来源'}</span>
+        <span>${news.time || ''}</span>
+      </div>
+    `;
+    listEl.appendChild(item);
+  });
+}
+
+/**
+ * 渲染最终结局
+ */
+export async function renderFinalEnding() {
+  setGamePhase('final_ending');
+  switchScreen('final_ending');
+  playBGM('ending');
+
+  const ending = getFinalEnding();
+
+  const titleEl = document.getElementById('final-ending-title');
+  const textEl = document.getElementById('final-ending-text');
+  const scoreEl = document.getElementById('final-ending-score');
+
+  if (titleEl) titleEl.textContent = ending.title;
+  if (textEl) textEl.textContent = ending.text;
+
+  // 累计评分
+  const results = getCasesResults();
+  const totalScore = results.reduce((sum, r) => sum + (r?.score || 0), 0);
+  if (scoreEl) scoreEl.textContent = `总推理评分: ${totalScore}`;
+
+  console.log('[sceneManager] 渲染最终结局:', getFinalEndingType());
+}
+
 /**
  * Day4: 从存档恢复游戏状态与画面
  */
-export function restoreFromSave() {
-  return _restoreFromSave();
+export async function restoreFromSave() {
+  return await _restoreFromSave();
 }
 
-function _restoreFromSave() {
+async function _restoreFromSave() {
   const data = loadGame();
   if (!data || !data.state) {
     console.warn('[sceneManager] 无存档或读档失败');
@@ -713,7 +1083,33 @@ function _restoreFromSave() {
   }
 
   const state = data.state;
-  console.log('[sceneManager] 从存档恢复，阶段:', state.currentPhase);
+  const gamePhase = state.gamePhase || 'menu';
+  console.log('[sceneManager] 从存档恢复，gamePhase:', gamePhase, 'currentPhase:', state.currentPhase);
+
+  // 优先按 gamePhase（跨案件层）恢复
+  if (gamePhase === 'hub') {
+    switchScreen('hub');
+    playBGM('menu');
+    _renderHub();
+    return true;
+  }
+
+  if (gamePhase === 'final_ending') {
+    renderFinalEnding();
+    return true;
+  }
+
+  // 按单案件阶段恢复（需确保案件数据已加载）
+  if (state.currentCaseIndex >= 0 && state.currentCaseIndex !== undefined) {
+    try {
+      const caseData = await _loadCase(state.currentCaseIndex);
+      setCaseData(caseData);
+    } catch (e) {
+      console.warn('[sceneManager] 恢复时加载案件失败，回退到主菜单:', e);
+      switchScreen('menu');
+      return false;
+    }
+  }
 
   // 根据阶段恢复画面
   switch (state.currentPhase) {
@@ -723,17 +1119,19 @@ function _restoreFromSave() {
       break;
 
     case 'investigate':
-      if (state.currentScene && _scenesData[state.currentScene]) {
+      if (state.currentScene && _scenesData && _scenesData[state.currentScene]) {
         switchScene(state.currentScene);
-      } else {
+      } else if (_scenesData) {
         const firstSceneId = Object.keys(_scenesData)[0];
         switchScene(firstSceneId);
+      } else {
+        switchScreen('menu');
       }
       break;
 
     case 'interrogation':
       if (state.currentSuspect && _caseData) {
-        const suspect = _caseData.suspects?.find(s => s.id === state.currentSuspect);
+        const suspect = _caseData.suspects?.find(s => (typeof s === 'string' ? s === state.currentSuspect : s.id === state.currentSuspect));
         if (suspect) {
           renderInterrogationScene(suspect);
         } else {
@@ -892,13 +1290,13 @@ function _bindGlobalActions() {
 async function _handleGlobalAction(action, btn) {
   switch (action) {
     case 'new-game':
+      // 多案件扩展：从案件1开始全新流程
       resetState();
-      switchScreen('briefing');
-      renderBriefing();
+      await startCase(0);
       break;
 
     case 'continue':
-      // Day4: 从存档继续游戏
+      // 从存档继续游戏（支持多案件 gamePhase）
       _restoreFromSave();
       break;
 
@@ -935,6 +1333,22 @@ async function _handleGlobalAction(action, btn) {
 
     case 'back-menu':
       switchScreen('menu');
+      playBGM('menu');
+      break;
+
+    case 'back-hub':
+      // 案件结局后返回事务所 Hub
+      await endCaseAndReturnHub();
+      break;
+
+    case 'next-case':
+      // Hub 画面"开始调查"按钮：进入下一个案件或最终结局
+      await _handleNextFromHub();
+      break;
+
+    case 'review-case':
+      // 回顾已结案件卷宗（显示简要摘要）
+      await _handleReviewCases();
       break;
 
     case 'present-evidence':

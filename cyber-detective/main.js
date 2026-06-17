@@ -22,12 +22,13 @@ let _caseData = null;
 let _charactersData = null;
 let _evidenceData = null;
 let _dialoguesData = null;
+let _plotData = null;
 
 // ====================
 // 资源加载进度
 // ====================
 let _loadingProgress = 0;
-const _totalResources = 4;
+const _totalResources = 5;
 
 // ====================
 // 初始化
@@ -38,11 +39,12 @@ async function init() {
 
   // 加载所有数据文件
   try {
-    const [caseRes, charRes, evidenceRes, dialoguesRes] = await Promise.all([
-      fetch('/data/case.json'),
+    const [caseRes, charRes, evidenceRes, dialoguesRes, plotRes] = await Promise.all([
+      fetch('/data/cases/case_001.json'),
       fetch('/data/characters.json'),
       fetch('/data/evidence.json'),
-      fetch('/data/dialogues.json')
+      fetch('/data/dialogues.json'),
+      fetch('/data/plot.json')
     ]);
 
     _caseData = await caseRes.json();
@@ -58,6 +60,10 @@ async function init() {
     updateLoadingBar();
 
     _dialoguesData = await dialoguesRes.json();
+    _loadingProgress++;
+    updateLoadingBar();
+
+    _plotData = await plotRes.json();
     _loadingProgress++;
     updateLoadingBar();
 
@@ -85,7 +91,15 @@ async function init() {
 
   // 初始化各模块
   initDialogueSystem();
-  initSceneManager(_caseData.scenes, _caseData);
+
+  // 多案件扩展：案件数据按需加载器
+  const caseLoader = async (caseId) => {
+    const res = await fetch(`/data/cases/${caseId}.json`);
+    if (!res.ok) throw new Error(`加载案件 ${caseId} 失败: ${res.status}`);
+    return res.json();
+  };
+
+  initSceneManager(_caseData.scenes, _caseData, _plotData, caseLoader);
   initEvidenceSystem(_evidenceData);
   initAudioManager();
 

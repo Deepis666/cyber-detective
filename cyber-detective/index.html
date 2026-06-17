@@ -125,12 +125,58 @@
       </div>
     </div>
 
+    <!-- 侦探事务所 Hub 画面（案件间过场） -->
+    <div id="hub-screen" class="screen">
+      <div class="hub-bg"></div>
+      <div class="hub-content">
+        <!-- 顶部状态栏 -->
+        <div class="hub-topbar">
+          <div class="hub-date">2087年 · 新香港</div>
+          <div id="hub-progress-label" class="hub-progress-label">案件进度</div>
+        </div>
+        <!-- 中央主区域 -->
+        <div class="hub-main">
+          <!-- 左侧：AI助手 -->
+          <div class="hub-ai-panel">
+            <div class="hub-ai-avatar">
+              <div class="hub-ai-eye"></div>
+            </div>
+            <div id="hub-ai-dialogue" class="hub-ai-dialogue"></div>
+          </div>
+          <!-- 右侧：新闻简报 -->
+          <div class="hub-news-panel">
+            <div class="hub-news-header">实时新闻简报</div>
+            <div id="hub-news-list" class="hub-news-list"></div>
+          </div>
+        </div>
+        <!-- 底部操作栏 -->
+        <div class="hub-bottom">
+          <div id="hub-case-indicator" class="hub-case-indicator"></div>
+          <div class="hub-actions">
+            <button class="cyber-btn" data-action="review-case">回顾案件卷宗</button>
+            <button id="hub-next-btn" class="cyber-btn hub-next-btn" data-action="next-case">开始调查</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 最终结局画面 -->
+    <div id="final-ending-screen" class="screen">
+      <div class="ending-content">
+        <h2 id="final-ending-title" class="neon-text"></h2>
+        <div id="final-ending-text" class="ending-text"></div>
+        <div id="final-ending-score" class="ending-score"></div>
+        <button class="cyber-btn" data-action="back-menu">返回主菜单</button>
+      </div>
+    </div>
+
     <!-- 结局画面 -->
     <div id="ending-screen" class="screen">
       <div class="ending-content">
         <h2 id="ending-title" class="neon-text"></h2>
         <div id="ending-text" class="ending-text"></div>
         <div id="ending-score" class="ending-score"></div>
+        <button class="cyber-btn" data-action="back-hub">返回事务所</button>
         <button class="cyber-btn" data-action="back-menu">返回主菜单</button>
       </div>
     </div>

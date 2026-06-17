@@ -1,0 +1,83 @@
+{
+  "caseId": "case_001",
+  "title": "霓虹公寓谋杀案",
+  "setting": {
+    "time": "2087年11月15日凌晨2点",
+    "location": "新香港·下城区·霓虹公寓404室",
+    "background": "死者是一名黑市义体医生，在非法神经植入领域颇有名气。案发当晚房门反锁，窗户紧闭，无强行闯入痕迹，现场发现死者后脑的神经接口被暴力拔出，但屋内财物完好。"
+  },
+  "victim": {
+    "name": "陈老九",
+    "identity": "黑市义体医生",
+    "description": "60岁，在地下诊所行医20年，专门为底层居民安装廉价神经接口和二手义肢。性格孤僻，独居，但与三个嫌疑人各有往来。"
+  },
+  "suspects": ["suspect_001", "suspect_002", "suspect_003"],
+  "truth": {
+    "killerId": "suspect_001",
+    "motive": "死者掌握了嫌疑人从事非法义体实验的证据，并威胁向其背后的公司举报",
+    "weapon": "改装电磁脉冲注射器",
+    "keyEvidence": ["evidence_003", "evidence_005"]
+  },
+  "scenes": {
+    "scene_body": {
+      "id": "scene_body",
+      "name": "案发现场·404室",
+      "description": "404室房门半掩，一股烧焦的电路板气味扑面而来。陈老九的尸体倒在床和工坊操作台之间，后脑的神经接口被暴力拔出，接口周围的组织呈现不正常的焦黑色。房间窗户紧闭，从内部反锁——这是一间密室。",
+      "bgImage": "assets/bg/scene_body.png",
+      "hotspots": [
+        { "id": "body_examine", "label": "检查尸体", "type": "evidence", "evidenceId": "evidence_005", "position": { "top": "40%", "left": "50%", "width": "100px", "height": "120px" }, "once": true },
+        { "id": "pocket_search", "label": "搜索口袋", "type": "evidence", "evidenceId": "evidence_003", "position": { "top": "52%", "left": "42%", "width": "60px", "height": "60px" }, "once": true },
+        { "id": "move_corridor", "label": "前往走廊", "type": "move", "targetScene": "scene_corridor", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } },
+        { "id": "move_desk", "label": "查看书桌", "type": "move", "targetScene": "scene_desk", "position": { "top": "70%", "left": "10%", "width": "100px", "height": "80px" } }
+      ]
+    },
+    "scene_corridor": {
+      "id": "scene_corridor",
+      "name": "公寓走廊",
+      "description": "霓虹公寓4楼的走廊幽暗狭窄，头顶的日光灯管时不时滋滋闪烁。地上散落着外卖盒和废旧电子元件。404室门外贴着封条，走廊尽头的监控摄像头镜头已被激光切割器破坏。",
+      "bgImage": "assets/bg/scene_corridor.png",
+      "hotspots": [
+        { "id": "camera_examine", "label": "检查监控", "type": "evidence", "evidenceId": "evidence_002", "position": { "top": "15%", "left": "85%", "width": "60px", "height": "60px" }, "once": true },
+        { "id": "move_body", "label": "返回404室", "type": "move", "targetScene": "scene_body", "position": { "top": "60%", "left": "30%", "width": "80px", "height": "90px" } },
+        { "id": "move_workshop", "label": "前往地下工坊", "type": "move", "targetScene": "scene_workshop", "position": { "top": "85%", "left": "20%", "width": "100px", "height": "70px" } }
+      ]
+    },
+    "scene_desk": {
+      "id": "scene_desk",
+      "name": "陈老九的书桌",
+      "description": "一张布满焊痕的老旧金属书桌，上面堆满了电路板、焊枪和半拆解的义体零件。桌面的一角用老式钢笔压着一本手写账本——在这个全数据化的时代显得格外刺眼。",
+      "bgImage": "assets/bg/scene_desk.png",
+      "hotspots": [
+        { "id": "ledger_examine", "label": "翻阅账本", "type": "evidence", "evidenceId": "evidence_001", "position": { "top": "35%", "left": "55%", "width": "80px", "height": "60px" }, "once": true },
+        { "id": "move_body", "label": "返回404室", "type": "move", "targetScene": "scene_body", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    },
+    "scene_workshop": {
+      "id": "scene_workshop",
+      "name": "地下义体工坊",
+      "description": "公寓地下室的秘密工坊，四周墙壁贴满了神经接口的解剖图和电路设计稿。空气中弥漫着焊接烟雾和消毒酒精的气味。角落的废料箱里有什么东西被打碎了——一枚数据芯片的碎片。",
+      "bgImage": "assets/bg/scene_workshop.png",
+      "hotspots": [
+        { "id": "chip_examine", "label": "检查碎片", "type": "evidence", "evidenceId": "evidence_004", "position": { "top": "70%", "left": "15%", "width": "70px", "height": "70px" }, "once": true },
+        { "id": "move_corridor", "label": "返回走廊", "type": "move", "targetScene": "scene_corridor", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    }
+  },
+  "endings": {
+    "ending_good": {
+      "condition": "score >= 80",
+      "title": "真相大白",
+      "description": "你成功揭穿了林小北的真面目。作为新人类集团安插的卧底，他在身份暴露后选择了极端手段。证据链完整地呈现在法庭上，新人类集团的非法实验也随之曝光。陈老九的冤魂终于得以安息。"
+    },
+    "ending_normal": {
+      "condition": "score >= 40",
+      "title": "疑案悬置",
+      "description": "你掌握了部分真相，但关键证据的缺失让最终裁定含糊不清。林小北被释放，但他的眼神里从此多了一层挥之不去的恐惧。这桩案件被归档为'证据不足'，沉入了下城区警局的冷案库。"
+    },
+    "ending_bad": {
+      "condition": "score < 40",
+      "title": "错判冤案",
+      "description": "在压力不足、证据链断裂的情况下，你做出了错误的裁定。真正的凶手逍遥法外，而一个无辜者背负了罪名。霓虹公寓的灯光依旧闪烁，但正义，又一次缺席了。"
+    }
+  }
+}

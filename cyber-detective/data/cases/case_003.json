@@ -1,0 +1,59 @@
+{
+  "caseId": "case_003",
+  "title": "义体战争",
+  "_status": "skeleton - 待 B(AI架构师) 填充完整内容，C(美术) 填充角色/证据",
+  "setting": {
+    "time": "TODO_B_填写时间",
+    "location": "TODO_B_填写地点（赛博反乌托邦/人体实验场所）",
+    "background": "TODO_B_填写案件背景：赛博反乌托邦，人体实验揭发"
+  },
+  "victim": {
+    "name": "TODO_B_受害者姓名",
+    "identity": "TODO_B_受害者身份",
+    "description": "TODO_B_受害者描述"
+  },
+  "suspects": ["suspect_301", "suspect_302", "suspect_303"],
+  "truth": {
+    "killerId": "suspect_301",
+    "motive": "TODO_B_动机",
+    "weapon": "TODO_B_凶器",
+    "keyEvidence": ["evidence_301", "evidence_302"]
+  },
+  "scenes": {
+    "scene_301": {
+      "id": "scene_301",
+      "name": "TODO_B_场景1名称",
+      "description": "TODO_B_场景1描述",
+      "bgImage": "assets/bg/case003_scene_1.png",
+      "hotspots": [
+        { "id": "examine_301", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_301", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_301", "label": "TODO_B_移动", "type": "move", "targetScene": "scene_302", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    },
+    "scene_302": {
+      "id": "scene_302",
+      "name": "TODO_B_场景2名称",
+      "description": "TODO_B_场景2描述",
+      "bgImage": "assets/bg/case003_scene_2.png",
+      "hotspots": [
+        { "id": "examine_302", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_302", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_302", "label": "TODO_B_移动", "type": "move", "targetScene": "scene_303", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    },
+    "scene_303": {
+      "id": "scene_303",
+      "name": "TODO_B_场景3名称",
+      "description": "TODO_B_场景3描述",
+      "bgImage": "assets/bg/case003_scene_3.png",
+      "hotspots": [
+        { "id": "examine_303", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_303", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_303", "label": "返回场景1", "type": "move", "targetScene": "scene_301", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    }
+  },
+  "endings": {
+    "ending_good": { "condition": "score >= 80", "title": "TODO_B_好结局标题", "description": "TODO_B_好结局描述" },
+    "ending_normal": { "condition": "score >= 40", "title": "TODO_B_普通结局标题", "description": "TODO_B_普通结局描述" },
+    "ending_bad": { "condition": "score < 40", "title": "TODO_B_坏结局标题", "description": "TODO_B_坏结局描述" }
+  }
+}

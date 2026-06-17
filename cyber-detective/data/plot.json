@@ -1,0 +1,114 @@
+{
+  "_comment": "主线剧情数据 - 侦探事务所Hub对话/新闻简报/AI助手交互/分支规则。骨架已就位，待 B(AI架构师) 填充完整内容。A(程序) 已基于此结构实现 plotManager.js。",
+  "_status": "skeleton - 待 B 填充完整对话与分支内容",
+
+  "meta": {
+    "version": 1,
+    "totalMainCases": 3,
+    "hiddenCaseIndex": 3,
+    "goodEndingThreshold": 80
+  },
+
+  "hubDialogues": {
+    "after_case_001": {
+      "_comment": "案件1结束后返回事务所的对话序列，按案件1结果分支",
+      "good": [
+        { "speaker": "ai_assistant", "text": "侦探，霓虹公寓案的卷宗已经归档。但你注意到了吗？陈老九的账本里反复出现'锐义科技'的标记。", "type": "narration" },
+        { "speaker": "ai_assistant", "text": "新人类集团的卧底只是冰山一角。我截获了一段加密数据流，指向锐义科技的核心数据库——那里藏着比'涅槃'更大的秘密。", "type": "narration" }
+      ],
+      "normal": [
+        { "speaker": "ai_assistant", "text": "案件1以悬案告终。不过陈老九账本里的'锐义科技'线索，值得我们继续追查。", "type": "narration" }
+      ],
+      "bad": [
+        { "speaker": "ai_assistant", "text": "霓虹公寓案我们失败了。但下城区的传闻不会停止——锐义科技的名字又开始在黑市流传。", "type": "narration" }
+      ]
+    },
+    "after_case_002": {
+      "_comment": "TODO_B 填充案件2结束后的Hub对话（按结果分支）",
+      "good": [
+        { "speaker": "ai_assistant", "text": "TODO_B_案件2好结局后AI助手对话", "type": "narration" }
+      ],
+      "normal": [
+        { "speaker": "ai_assistant", "text": "TODO_B_案件2普通结局后AI助手对话", "type": "narration" }
+      ],
+      "bad": [
+        { "speaker": "ai_assistant", "text": "TODO_B_案件2坏结局后AI助手对话", "type": "narration" }
+      ]
+    },
+    "after_case_003": {
+      "_comment": "TODO_B 填充案件3结束后的Hub对话（按结果分支，含隐藏案件解锁提示）",
+      "good": [
+        { "speaker": "ai_assistant", "text": "TODO_B_案件3好结局后AI助手对话（若前3案全好结局，提示解锁隐藏案件）", "type": "narration" }
+      ],
+      "normal": [
+        { "speaker": "ai_assistant", "text": "TODO_B_案件3普通结局后AI助手对话", "type": "narration" }
+      ],
+      "bad": [
+        { "speaker": "ai_assistant", "text": "TODO_B_案件3坏结局后AI助手对话", "type": "narration" }
+      ]
+    }
+  },
+
+  "newsFeed": {
+    "after_case_001": [
+      { "headline": "TODO_B_案件1后新闻标题1", "source": "新香港晨报", "time": "2087.11.16" },
+      { "headline": "TODO_B_案件1后新闻标题2", "source": "下城区快讯", "time": "2087.11.16" }
+    ],
+    "after_case_002": [
+      { "headline": "TODO_B_案件2后新闻标题1", "source": "新香港晨报", "time": "TODO_B" },
+      { "headline": "TODO_B_案件2后新闻标题2", "source": "企业观察", "time": "TODO_B" }
+    ],
+    "after_case_003": [
+      { "headline": "TODO_B_案件3后新闻标题1", "source": "新香港晨报", "time": "TODO_B" }
+    ]
+  },
+
+  "npcInteractions": {
+    "_comment": "事务所内AI助手'赛博义眼'的交互选项，TODO_B 填充",
+    "options": [
+      { "id": "review_case", "label": "回顾已结案件", "dialogue": "TODO_B_回顾案件时的AI对话" },
+      { "id": "next_case", "label": "接受下一个案件", "dialogue": "TODO_B_接受新案件时的AI对话" },
+      { "id": "analyze_clue", "label": "分析跨案件线索", "dialogue": "TODO_B_分析线索时的AI对话" }
+    ]
+  },
+
+  "plotBranches": {
+    "_comment": "主线分支规则：根据前案累积结果决定后续Hub对话和最终结局走向",
+    "rules": [
+      {
+        "id": "branch_all_good",
+        "condition": "casesResults.every(r => r.ending === 'ending_good')",
+        "effect": "unlock_hidden_case",
+        "description": "全部主线案件达成好结局，解锁隐藏案件'最后的真相'"
+      },
+      {
+        "id": "branch_mixed",
+        "condition": "casesResults.some(r => r.ending === 'ending_good') && casesResults.some(r => r.ending !== 'ending_good')",
+        "effect": "final_ending_mixed",
+        "description": "混合结局，进入普通最终结局"
+      },
+      {
+        "id": "branch_all_bad",
+        "condition": "casesResults.every(r => r.ending === 'ending_bad')",
+        "effect": "final_ending_bad",
+        "description": "全部失败，进入坏结局"
+      }
+    ]
+  },
+
+  "finalEndings": {
+    "_comment": "全部案件结束后的最终结局文本，TODO_B 填充3种",
+    "all_good": {
+      "title": "TODO_B_全好结局标题",
+      "text": "TODO_B_全好结局文本：揭开所有真相，幕后黑手伏法"
+    },
+    "mixed": {
+      "title": "TODO_B_混合结局标题",
+      "text": "TODO_B_混合结局文本：部分真相浮出，但阴影仍未散去"
+    },
+    "all_bad": {
+      "title": "TODO_B_全坏结局标题",
+      "text": "TODO_B_全坏结局文本：正义全面溃败，城市沉入永夜"
+    }
+  }
+}

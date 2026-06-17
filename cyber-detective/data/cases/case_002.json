@@ -1,0 +1,59 @@
+{
+  "caseId": "case_002",
+  "title": "数据深渊",
+  "_status": "skeleton - 待 B(AI架构师) 填充完整内容，C(美术) 填充角色/证据到 characters.json/evidence.json",
+  "setting": {
+    "time": "TODO_B_填写时间",
+    "location": "TODO_B_填写地点（锐义科技总部/数据中心）",
+    "background": "TODO_B_填写案件背景：锐义科技数据犯罪，企业阴谋"
+  },
+  "victim": {
+    "name": "TODO_B_受害者姓名",
+    "identity": "TODO_B_受害者身份",
+    "description": "TODO_B_受害者描述"
+  },
+  "suspects": ["suspect_201", "suspect_202", "suspect_203"],
+  "truth": {
+    "killerId": "suspect_201",
+    "motive": "TODO_B_动机",
+    "weapon": "TODO_B_凶器",
+    "keyEvidence": ["evidence_201", "evidence_202"]
+  },
+  "scenes": {
+    "scene_201": {
+      "id": "scene_201",
+      "name": "TODO_B_场景1名称",
+      "description": "TODO_B_场景1描述",
+      "bgImage": "assets/bg/case002_scene_1.png",
+      "hotspots": [
+        { "id": "examine_201", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_201", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_201", "label": "TODO_B_移动", "type": "move", "targetScene": "scene_202", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    },
+    "scene_202": {
+      "id": "scene_202",
+      "name": "TODO_B_场景2名称",
+      "description": "TODO_B_场景2描述",
+      "bgImage": "assets/bg/case002_scene_2.png",
+      "hotspots": [
+        { "id": "examine_202", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_202", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_202", "label": "TODO_B_移动", "type": "move", "targetScene": "scene_203", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    },
+    "scene_203": {
+      "id": "scene_203",
+      "name": "TODO_B_场景3名称",
+      "description": "TODO_B_场景3描述",
+      "bgImage": "assets/bg/case002_scene_3.png",
+      "hotspots": [
+        { "id": "examine_203", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_203", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_203", "label": "返回场景1", "type": "move", "targetScene": "scene_201", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+      ]
+    }
+  },
+  "endings": {
+    "ending_good": { "condition": "score >= 80", "title": "TODO_B_好结局标题", "description": "TODO_B_好结局描述" },
+    "ending_normal": { "condition": "score >= 40", "title": "TODO_B_普通结局标题", "description": "TODO_B_普通结局描述" },
+    "ending_bad": { "condition": "score < 40", "title": "TODO_B_坏结局标题", "description": "TODO_B_坏结局描述" }
+  }
+}
