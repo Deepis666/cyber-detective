@@ -6,9 +6,10 @@
  * 场景数据从 data/ 目录加载。
  */
 
-import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState } from './gameState.js';
+import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState, addStress, addScore, getStress, getEmotion } from './gameState.js';
 import { showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, showDialogueOverlay } from './dialogueSystem.js';
 import { getEvidenceData, presentEvidence as evidencePresent, combineEvidence as evidenceCombine, selectEvidence, getSelectedEvidence, clearSelectedEvidence, renderEvidenceBar } from './evidenceSystem.js';
+import { interrogateAI, investigateAI, isAPIAvailable } from './aiEngine.js';
 
 // ====================
 // 场景数据缓存
@@ -268,7 +269,7 @@ async function _playInterrogationOpening(suspectId) {
   }
 }
 
-// Day2：提问处理
+// Day3：提问处理 - 接入 AI 引擎
 async function _handleAskQuestion() {
   const state = getState();
   const suspectId = state.currentSuspect;
@@ -304,12 +305,62 @@ async function _handleAskQuestion() {
 
     const choice = await showOptions(options);
 
-    // 根据问题类型生成回应（Day2 使用预设回应）
+    // Day3: 优先使用 AI 引擎
+    if (isAPIAvailable()) {
+      try {
+        const aiResult = await interrogateAI({
+          suspectId,
+          action: 'question',
+          content: choice.text
+        });
+
+        if (aiResult && aiResult.response) {
+          // 应用压力变化
+          if (aiResult.stressDelta) {
+            addStress(suspectId, aiResult.stressDelta);
+          }
+          if (aiResult.hasContradiction) {
+            addScore(10);
+          }
+          _updateStressDisplay(suspectId);
+
+          await showDialogue({
+            speaker: suspectId,
+            text: aiResult.response,
+            type: 'ai_generated',
+            emotion: aiResult.emotion
+          });
+
+          if (aiResult.hasContradiction) {
+            await showDialogue({
+              speaker: 'system',
+              text: `【关键信息揭露！压力 ${aiResult.stressDelta > 0 ? '+' : ''}${aiResult.stressDelta || 0}】`,
+              type: 'narration'
+            });
+          }
+
+          if (aiResult.newClue) {
+            await showDialogue({
+              speaker: 'system',
+              text: `【新线索发现：${aiResult.newClue}】`,
+              type: 'normal'
+            });
+          }
+
+          _checkEndingCondition(getState());
+          return;
+        }
+      } catch (e) {
+        console.warn('[sceneManager] AI 提问失败，使用预设逻辑:', e);
+      }
+    }
+
+    // 离线模式：使用预设逻辑
     await _generateQuestionResponse(suspectId, choice, state);
   }
 }
 
-// Day2：施压处理
+// Day3：施压处理 - 接入 AI 引擎
 async function _handlePressure() {
   const state = getState();
   const suspectId = state.currentSuspect;
@@ -324,11 +375,47 @@ async function _handlePressure() {
     type: 'normal'
   });
 
-  // 施压增加压力值
-  addStress(suspectId, 15);
-  updateStressDisplay(suspectId);
+  // Day3: 优先使用 AI 引擎
+  if (isAPIAvailable()) {
+    try {
+      const aiResult = await interrogateAI({
+        suspectId,
+        action: 'pressure',
+        content: '侦探施压，要求嫌疑人说出真相'
+      });
 
-  // 根据压力等级给出不同回应
+      if (aiResult && aiResult.response) {
+        if (aiResult.stressDelta) {
+          addStress(suspectId, aiResult.stressDelta);
+        }
+        _updateStressDisplay(suspectId);
+
+        await showDialogue({
+          speaker: suspectId,
+          text: aiResult.response,
+          type: 'ai_generated',
+          emotion: aiResult.emotion
+        });
+
+        const newStress = getStress(suspectId);
+        await showDialogue({
+          speaker: 'system',
+          text: `【压力值 ${stress} → ${newStress}】`,
+          type: 'narration'
+        });
+
+        _checkEndingCondition(getState());
+        return;
+      }
+    } catch (e) {
+      console.warn('[sceneManager] AI 施压失败，使用预设逻辑:', e);
+    }
+  }
+
+  // 离线模式：预设施压逻辑
+  addStress(suspectId, 15);
+  _updateStressDisplay(suspectId);
+
   let emotion = 'calm';
   let responseText = '';
   const newStress = Math.min(100, stress + 15);
@@ -357,7 +444,6 @@ async function _handlePressure() {
     type: 'narration'
   });
 
-  // 检查是否触发结局条件
   _checkEndingCondition(state);
 }
 
@@ -454,9 +540,17 @@ function _updateStressDisplay(suspectId) {
   const state = getState();
   const stress = state.stressLevel[suspectId] || 0;
 
+  // 更新压力条
   if (_elements.stressBarFill) {
     _elements.stressBarFill.style.width = `${stress}%`;
   }
+
+  // Day3: 更新压力条发光效果
+  const stressGlow = document.getElementById('stress-bar-glow');
+  if (stressGlow) {
+    stressGlow.style.opacity = stress > 60 ? '1' : stress > 30 ? '0.5' : '0';
+  }
+
   if (_elements.stressValue) {
     _elements.stressValue.textContent = stress;
   }
@@ -476,6 +570,24 @@ function _updateStressDisplay(suspectId) {
     _elements.emotionTag.textContent = emotion;
     _elements.emotionTag.className = 'emotion-tag';
     if (emotionClass) _elements.emotionTag.classList.add(emotionClass);
+  }
+
+  // Day3: 更新心理指标面板
+  const defenseEl = document.getElementById('defense-level');
+  const contradictionEl = document.getElementById('contradiction-level');
+
+  if (defenseEl) {
+    // 防御等级：压力越低防御越高
+    const defenseLevel = Math.max(0, 4 - Math.floor(stress / 25));
+    defenseEl.textContent = '█'.repeat(defenseLevel) + '░'.repeat(4 - defenseLevel);
+    defenseEl.className = `psych-metric-value defense-${defenseLevel}`;
+  }
+
+  if (contradictionEl) {
+    // 矛盾等级：压力越高矛盾越多
+    const contradictionLevel = Math.min(4, Math.floor(stress / 25));
+    contradictionEl.textContent = '█'.repeat(contradictionLevel) + '░'.repeat(4 - contradictionLevel);
+    contradictionEl.className = `psych-metric-value contradiction-${contradictionLevel}`;
   }
 }
 
@@ -569,7 +681,48 @@ async function _handleHotspotClick(hotspot) {
       break;
 
     case 'examine':
-      // 纯调查对话，已在上方显示
+      // Day3: 尝试使用 AI 增强场景调查
+      if (isAPIAvailable() && hotspot.label) {
+        try {
+          const currentScene = getState().currentScene;
+          const aiResult = await investigateAI({
+            sceneId: currentScene,
+            action: hotspot.label
+          });
+          if (aiResult && aiResult.description) {
+            await showDialogue({
+              speaker: 'narration',
+              text: aiResult.description,
+              type: 'narration'
+            });
+            if (aiResult.atmosphere) {
+              await showDialogue({
+                speaker: 'narration',
+                text: aiResult.atmosphere,
+                type: 'narration'
+              });
+            }
+            // 如果 AI 发现了证据
+            if (aiResult.foundEvidence && aiResult.foundEvidence.length > 0) {
+              for (const evId of aiResult.foundEvidence) {
+                const added = addEvidence(evId);
+                if (added) {
+                  const evData = getEvidenceData(evId);
+                  await showDialogue({
+                    speaker: 'system',
+                    text: `获得证据：${evData?.name || evId}`,
+                    type: 'normal'
+                  });
+                }
+              }
+            }
+            break;
+          }
+        } catch (e) {
+          console.warn('[sceneManager] AI 场景调查失败，使用预设对话:', e);
+        }
+      }
+      // 离线模式：纯调查对话，已在上方显示
       break;
   }
 

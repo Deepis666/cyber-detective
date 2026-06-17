@@ -71,14 +71,28 @@
         <!-- 角色立绘 -->
         <div class="character-panel">
           <img id="character-portrait" class="character-img" src="" alt="嫌疑人" />
-          <div id="stress-bar-container" class="stress-bar-container">
-            <span class="stress-label">压力值</span>
-            <div class="stress-bar">
-              <div id="stress-bar-fill" class="stress-bar-fill"></div>
+          <!-- 心理状态面板 -->
+          <div class="psych-panel">
+            <div id="stress-bar-container" class="stress-bar-container">
+              <span class="stress-label">神经过载</span>
+              <div class="stress-bar">
+                <div id="stress-bar-fill" class="stress-bar-fill"></div>
+                <div id="stress-bar-glow" class="stress-bar-glow"></div>
+              </div>
+              <span id="stress-value" class="stress-value">0</span>
             </div>
-            <span id="stress-value" class="stress-value">0</span>
+            <div id="emotion-tag" class="emotion-tag">冷静</div>
+            <div id="psych-detail" class="psych-detail">
+              <span class="psych-metric">
+                <span class="psych-metric-label">防御</span>
+                <span id="defense-level" class="psych-metric-value">████</span>
+              </span>
+              <span class="psych-metric">
+                <span class="psych-metric-label">矛盾</span>
+                <span id="contradiction-level" class="psych-metric-value">░░░░</span>
+              </span>
+            </div>
           </div>
-          <div id="emotion-tag" class="emotion-tag">冷静</div>
         </div>
         <!-- 审讯交互区 -->
         <div class="interrogation-panel">

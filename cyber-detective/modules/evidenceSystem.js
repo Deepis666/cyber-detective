@@ -15,6 +15,7 @@ import {
   getState
 } from './gameState.js';
 import { showDialogue, showOptions } from './dialogueSystem.js';
+import { evidenceCombineAI, interrogateAI, isAPIAvailable } from './aiEngine.js';
 
 // ====================
 // 证据数据缓存
@@ -166,17 +167,25 @@ export async function combineEvidence(ev1, ev2) {
     };
   }
 
-  // 检查是否可组合
+  // Day3: 优先使用 AI 引擎
+  if (isAPIAvailable()) {
+    try {
+      const aiResult = await evidenceCombineAI({ ev1, ev2 });
+      if (aiResult) {
+        addScore(aiResult.isRelevant ? 10 : 0);
+        return aiResult;
+      }
+    } catch (e) {
+      console.warn('[evidenceSystem] AI 证据组合失败，使用预设逻辑:', e);
+    }
+  }
+
+  // 离线模式：使用预设逻辑
   const canCombine = _canCombine(ev1Data, ev2Data);
 
-  // TODO: Day3 接入 AI 证据组合推理
-  // 目前使用预设逻辑
-
   if (canCombine) {
-    // 检查是否解锁新证据
     const unlockedEvidence = _checkUnlockEvidence(ev1, ev2);
-
-    addScore(10); // 组合成功加 10 分
+    addScore(10);
 
     return {
       isRelevant: true,
@@ -215,17 +224,41 @@ export async function presentEvidence(suspectId, evidenceId) {
     };
   }
 
-  // TODO: Day3 接入 AI 审讯引擎
-  // 目前使用预设逻辑
+  // Day3: 优先使用 AI 引擎
+  if (isAPIAvailable()) {
+    try {
+      const aiResult = await interrogateAI({
+        suspectId,
+        action: 'present_evidence',
+        content: `侦探出示了证据：${evData.name}——${evData.description}`
+      });
 
-  // 检查证据是否与嫌疑人相关
+      if (aiResult && aiResult.response) {
+        // 应用压力变化
+        if (aiResult.stressDelta) {
+          addStress(suspectId, aiResult.stressDelta);
+        }
+        if (aiResult.hasContradiction) {
+          addScore(15);
+        }
+        return {
+          response: aiResult.response,
+          stressDelta: aiResult.stressDelta || 0,
+          isContradiction: aiResult.hasContradiction || false
+        };
+      }
+    } catch (e) {
+      console.warn('[evidenceSystem] AI 出示证据失败，使用预设逻辑:', e);
+    }
+  }
+
+  // 离线模式：使用预设逻辑
   const isRelated = evData.relatedTo && evData.relatedTo.includes(suspectId);
 
   if (isRelated) {
-    // 关键证据，增加压力
     const stressDelta = 20;
     addStress(suspectId, stressDelta);
-    addScore(15); // 出示关键证据加分
+    addScore(15);
 
     return {
       response: `（嫌疑人看到${evData.name}后明显动摇）这...这不能说明什么！你凭什么...`,
@@ -234,7 +267,6 @@ export async function presentEvidence(suspectId, evidenceId) {
     };
   }
 
-  // 无关证据
   return {
     response: `（嫌疑人看了一眼${evData.name}）这和我有什么关系？你在浪费时间。`,
     stressDelta: 0,
