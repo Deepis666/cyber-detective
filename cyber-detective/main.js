@@ -10,7 +10,7 @@
 // ====================
 import { initDialogueSystem, showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, setSpeakerNameMap } from './modules/dialogueSystem.js';
 import { getState, onStateChange, resetState, hasSaveData, loadGame, saveGame, setPhase, addEvidence, getFlag, setFlag, addScore, getStress, getEmotion, addStress } from './modules/gameState.js';
-import { initSceneManager, switchScreen, switchScene, renderBriefing, renderInterrogationScene, renderEnding, updateStressDisplay } from './modules/sceneManager.js';
+import { initSceneManager, switchScreen, switchScene, renderBriefing, renderInterrogationScene, renderEnding, updateStressDisplay, updateScoreDisplay } from './modules/sceneManager.js';
 import { initEvidenceSystem, renderEvidenceBar, combineEvidence, presentEvidence, selectEvidence, getSelectedEvidence, clearSelectedEvidence, getEvidenceData } from './modules/evidenceSystem.js';
 import { initAudioManager, playBGM, playSFX, stopAllAudio } from './modules/audioManager.js';
 import { initAIEngine, interrogateAI, evidenceCombineAI, showAIThinking, fallbackResponse, isAPIAvailable } from './modules/aiEngine.js';
@@ -65,6 +65,17 @@ async function init() {
     window._dialoguesData = _dialoguesData;
     window._caseData = _caseData;
     window._charactersData = _charactersData;
+
+    // 数据集成：将 case.json 中的嫌疑人 ID 列表与 characters.json 合并为完整对象
+    if (_caseData && _charactersData?.characters && Array.isArray(_caseData.suspects)) {
+      _caseData.suspects = _caseData.suspects.map(id => {
+        const character = _charactersData.characters.find(c => c.id === id);
+        if (!character) {
+          console.warn(`[main] 未找到嫌疑人数据: ${id}`);
+        }
+        return character || { id, name: id };
+      });
+    }
 
     console.log('[main] 数据文件加载完成');
   } catch (e) {
@@ -142,8 +153,13 @@ function _onStateChange(state, patch) {
     }
   }
 
-  // 自动存档
-  if (state.currentPhase !== 'intro') {
+  // 更新推理评分显示
+  if (patch.score !== undefined) {
+    updateScoreDisplay(state.score);
+  }
+
+  // 自动存档（仅在非标题/简报阶段，避免覆盖正常进度）
+  if (state.currentPhase && state.currentPhase !== 'intro') {
     saveGame();
   }
 }

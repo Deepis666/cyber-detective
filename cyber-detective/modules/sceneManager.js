@@ -6,10 +6,11 @@
  * 场景数据从 data/ 目录加载。
  */
 
-import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState, addStress, addScore, getStress, getEmotion } from './gameState.js';
+import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState, addStress, addScore, getStress, getEmotion, setEnding, loadGame, resetState } from './gameState.js';
 import { showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, showDialogueOverlay } from './dialogueSystem.js';
 import { getEvidenceData, presentEvidence as evidencePresent, combineEvidence as evidenceCombine, selectEvidence, getSelectedEvidence, clearSelectedEvidence, renderEvidenceBar } from './evidenceSystem.js';
 import { interrogateAI, investigateAI, isAPIAvailable } from './aiEngine.js';
+import { playBGM, playSFX } from './audioManager.js';
 
 // ====================
 // 场景数据缓存
@@ -107,6 +108,9 @@ export function switchScene(sceneId) {
   setCurrentScene(sceneId);
   setPhase('investigate');
   switchScreen('investigate');
+
+  // 播放调查场景BGM
+  playBGM('investigation');
 
   const scene = _scenesData[sceneId];
 
@@ -223,6 +227,9 @@ export function renderInterrogationScene(suspect) {
   setCurrentSuspect(suspect.id);
   setPhase('interrogation');
   switchScreen('interrogation');
+
+  // 播放审讯场景BGM
+  playBGM('interrogation');
 
   // 设置角色立绘
   if (suspect.portrait) {
@@ -414,6 +421,7 @@ async function _handlePressure() {
 
   // 离线模式：预设施压逻辑
   addStress(suspectId, 15);
+  playSFX('stress_up');
   _updateStressDisplay(suspectId);
 
   let emotion = 'calm';
@@ -505,26 +513,57 @@ async function _generateQuestionResponse(suspectId, question, state) {
   _checkEndingCondition(getState());
 }
 
-// Day2：检查结局触发条件
+// Day4：根据当前评分计算应触发的结局
+function _calculateEnding(state) {
+  const score = state.score || 0;
+  const endings = _caseData?.endings || {};
+
+  if (score >= 80) return 'ending_good';
+  if (score >= 40) return 'ending_normal';
+  return 'ending_bad';
+}
+
+// Day2/Day4：检查结局触发条件
 function _checkEndingCondition(state) {
   const score = state.score || 0;
   const stress = state.stressLevel[state.currentSuspect] || 0;
 
-  // 如果推理评分足够高且嫌疑人崩溃
+  // 如果推理评分足够高且当前嫌疑人崩溃，自动触发好结局
   if (score >= 80 && stress >= 67) {
-    // 触发好结局
-    setTimeout(() => _triggerEnding('ending_good', score), 500);
-  } else if (score < 40 && stress < 34) {
-    // 触发坏结局（玩家操作太差或没有进展）
-    // 不自动触发，等用户主动结束
+    const endingId = _calculateEnding(state);
+    setTimeout(() => _triggerEnding(endingId, score), 500);
   }
 }
 
-// Day2：触发结局
-async function _triggerEnding(endingId, score) {
+// Day4：手动结束案件
+async function _handleEndCase() {
+  const state = getState();
+  const score = state.score || 0;
+  const endingId = _calculateEnding(state);
+
+  // 显示确认提示
+  await showDialogue({
+    speaker: 'system',
+    text: `当前推理评分为 ${score}。你确定要结束案件并做出最终裁定吗？`,
+    type: 'normal'
+  });
+
+  const choice = await showOptions([
+    { text: '确认结案', action: 'custom', target: 'confirm' },
+    { text: '继续调查', action: 'custom', target: 'cancel' }
+  ]);
+
+  if (choice.target === 'confirm') {
+    _triggerEnding(endingId, score);
+  }
+}
+
+// Day2/Day4：触发结局
+function _triggerEnding(endingId, score) {
   if (!_caseData?.endings?.[endingId]) return;
 
   const ending = _caseData.endings[endingId];
+  setEnding(endingId);
   renderEnding({ title: ending.title, text: ending.description, score });
 }
 
@@ -536,6 +575,21 @@ export function updateStressDisplay(suspectId) {
   _updateStressDisplay(suspectId);
 }
 
+/**
+ * 更新推理评分显示
+ */
+export function updateScoreDisplay(score) {
+  const value = typeof score === 'number' ? score : (getState().score || 0);
+  const el1 = document.getElementById('score-value');
+  const el2 = document.getElementById('score-value-interrogation');
+  if (el1) el1.textContent = value;
+  if (el2) el2.textContent = value;
+}
+
+/**
+ * 更新压力条显示（内部实现）
+ * @param {string} suspectId
+ */
 function _updateStressDisplay(suspectId) {
   const state = getState();
   const stress = state.stressLevel[suspectId] || 0;
@@ -604,15 +658,19 @@ export function renderBriefing() {
     _elements.caseTitle.textContent = _caseData.title || '未知案件';
   }
   if (_elements.briefingSetting) {
+    const setting = _caseData.setting || {};
     _elements.briefingSetting.innerHTML = `
       <h4>案件背景</h4>
-      <p>${_caseData.setting || ''}</p>
+      <p class="briefing-meta">${setting.time || ''} · ${setting.location || ''}</p>
+      <p>${setting.background || ''}</p>
     `;
   }
   if (_elements.briefingVictim) {
+    const victim = _caseData.victim || {};
     _elements.briefingVictim.innerHTML = `
       <h4>受害者</h4>
-      <p>${_caseData.victim || ''}</p>
+      <p class="briefing-meta">${victim.name || ''} · ${victim.identity || ''}</p>
+      <p>${victim.description || ''}</p>
     `;
   }
 }
@@ -628,6 +686,9 @@ export function renderEnding(ending) {
   setPhase('ending');
   switchScreen('ending');
 
+  // 播放结局BGM
+  playBGM('ending');
+
   const titleEl = document.getElementById('ending-title');
   const textEl = document.getElementById('ending-text');
   const scoreEl = document.getElementById('ending-score');
@@ -637,9 +698,77 @@ export function renderEnding(ending) {
   if (scoreEl) scoreEl.textContent = `推理评分: ${ending.score || 0}`;
 }
 
-// ====================
-// 热点交互
-// ====================
+/**
+ * Day4: 从存档恢复游戏状态与画面
+ */
+export function restoreFromSave() {
+  return _restoreFromSave();
+}
+
+function _restoreFromSave() {
+  const data = loadGame();
+  if (!data || !data.state) {
+    console.warn('[sceneManager] 无存档或读档失败');
+    return false;
+  }
+
+  const state = data.state;
+  console.log('[sceneManager] 从存档恢复，阶段:', state.currentPhase);
+
+  // 根据阶段恢复画面
+  switch (state.currentPhase) {
+    case 'intro':
+      switchScreen('briefing');
+      renderBriefing();
+      break;
+
+    case 'investigate':
+      if (state.currentScene && _scenesData[state.currentScene]) {
+        switchScene(state.currentScene);
+      } else {
+        const firstSceneId = Object.keys(_scenesData)[0];
+        switchScene(firstSceneId);
+      }
+      break;
+
+    case 'interrogation':
+      if (state.currentSuspect && _caseData) {
+        const suspect = _caseData.suspects?.find(s => s.id === state.currentSuspect);
+        if (suspect) {
+          renderInterrogationScene(suspect);
+        } else {
+          switchScreen('menu');
+        }
+      } else {
+        switchScreen('menu');
+      }
+      break;
+
+    case 'ending':
+      if (state.endingTriggered && _caseData?.endings?.[state.endingTriggered]) {
+        const ending = _caseData.endings[state.endingTriggered];
+        renderEnding({ title: ending.title, text: ending.description, score: state.score || 0 });
+      } else {
+        switchScreen('menu');
+      }
+      break;
+
+    default:
+      switchScreen('menu');
+      break;
+  }
+
+  // 恢复 UI 状态
+  updateScoreDisplay(state.score || 0);
+  if (state.currentSuspect) {
+    updateStressDisplay(state.currentSuspect);
+  }
+  if (state.evidenceObtained) {
+    renderEvidenceBar(state.evidenceObtained);
+  }
+
+  return true;
+}
 
 async function _handleHotspotClick(hotspot) {
   // 标记已使用
@@ -658,6 +787,7 @@ async function _handleHotspotClick(hotspot) {
       if (hotspot.evidenceId) {
         const added = addEvidence(hotspot.evidenceId);
         if (added) {
+          playSFX('evidence_obtain');
           await showDialogue({
             speaker: 'system',
             text: `获得证据：${hotspot.evidenceName || hotspot.evidenceId}`,
@@ -754,6 +884,7 @@ function _bindGlobalActions() {
     if (!btn) return;
 
     const action = btn.dataset.action;
+    playSFX('click');
     _handleGlobalAction(action, btn);
   });
 }
@@ -761,12 +892,14 @@ function _bindGlobalActions() {
 async function _handleGlobalAction(action, btn) {
   switch (action) {
     case 'new-game':
+      resetState();
       switchScreen('briefing');
       renderBriefing();
       break;
 
     case 'continue':
-      // TODO: 从存档继续
+      // Day4: 从存档继续游戏
+      _restoreFromSave();
       break;
 
     case 'start-investigation':
@@ -831,6 +964,11 @@ async function _handleGlobalAction(action, btn) {
         const suspect = _caseData.suspects?.find(s => s.id === targetId);
         if (suspect) renderInterrogationScene(suspect);
       }
+      break;
+
+    case 'end-case':
+      // Day4: 手动结束案件，根据当前评分触发结局
+      await _handleEndCase();
       break;
   }
 }
@@ -958,6 +1096,7 @@ async function _doPresentEvidence(suspectId, evidenceId) {
 
   // 如果触发矛盾，显示提示
   if (result.isContradiction) {
+    playSFX('contradiction');
     await showDialogue({
       speaker: 'system',
       text: `【压力值 +${result.stressDelta}】嫌疑人明显动摇了！`,
@@ -1058,6 +1197,7 @@ async function _doCombineEvidence(ev1, ev2) {
 
   // 调用 evidenceSystem 的 combineEvidence
   const result = await evidenceCombine(ev1, ev2);
+  playSFX('evidence_combine');
 
   // 显示推理结果
   await showDialogue({

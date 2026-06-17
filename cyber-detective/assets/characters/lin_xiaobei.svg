@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a12"/>
+      <stop offset="100%" stop-color="#1a0a2e"/>
+    </linearGradient>
+    <linearGradient id="cyber" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#39ff14"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="240" height="320" fill="url(#bg)"/>
+  <!-- 网格背景 -->
+  <path d="M0 80 L240 80 M0 160 L240 160 M0 240 L240 240" stroke="#39ff14" stroke-opacity="0.08" stroke-width="1"/>
+  <path d="M80 0 L80 320 M160 0 L160 320" stroke="#39ff14" stroke-opacity="0.08" stroke-width="1"/>
+  <!-- 人物剪影 -->
+  <ellipse cx="120" cy="110" rx="45" ry="55" fill="#0d1a10" stroke="url(#cyber)" stroke-width="2"/>
+  <path d="M75 160 L75 280 L165 280 L165 160 Q165 140 120 140 Q75 140 75 160" fill="#0a140a" stroke="url(#cyber)" stroke-width="2"/>
+  <!-- 义体眼 -->
+  <rect x="95" y="100" width="50" height="8" rx="2" fill="#00f0ff" filter="url(#glow)"/>
+  <circle cx="120" cy="104" r="3" fill="#ffffff"/>
+  <!-- 颈部接口 -->
+  <rect x="105" y="155" width="30" height="6" rx="1" fill="#39ff14" filter="url(#glow)"/>
+  <!-- 标签 -->
+  <rect x="20" y="285" width="200" height="25" fill="rgba(0,0,0,0.6)" stroke="#39ff14" stroke-width="1"/>
+  <text x="120" y="302" font-family="monospace" font-size="14" fill="#39ff14" text-anchor="middle" letter-spacing="2">林小北 / LIN XIAOBEI</text>
+</svg>

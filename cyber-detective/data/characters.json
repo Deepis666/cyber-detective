@@ -4,7 +4,7 @@
       "id": "suspect_001",
       "name": "林小北",
       "identity": "死者助手",
-      "portrait": "assets/characters/lin_xiaobei.png",
+      "portrait": "characters/lin_xiaobei.svg",
       "profile": "25岁，跟随陈老九学习义体技术3年，表面忠诚老实。出身下城区贫民家庭，义体改造率40%，主要是基础感知增强。沉默寡言，但在技术问题上异常敏锐。",
       "personality": "内向、谨慎、有隐藏的野心。表面上对师傅言听计从，内心渴望摆脱底层身份。",
       "stressProfile": {
@@ -32,7 +32,7 @@
       "id": "suspect_002",
       "name": "赵明月",
       "identity": "义体公司高管",
-      "portrait": "assets/characters/zhao_mingyue.png",
+      "portrait": "characters/zhao_mingyue.svg",
       "profile": "35岁，锐义科技的高级研发主管，义体改造率75%，包括增强型视觉义眼和神经加速器。穿着考究，即使在下城区也保持着企业精英的气场。",
       "personality": "精明、强势、善于控制局面。表面冷静实则内心冷酷，对任何威胁自己地位的人绝不手软。",
       "stressProfile": {

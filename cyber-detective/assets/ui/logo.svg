@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <!-- Cyberpunk Detective Logo / Title Decoration -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a12"/>
+      <stop offset="100%" style="stop-color:#1a0a2e"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-strong" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background frame -->
+  <rect width="256" height="256" rx="8" fill="url(#bg)" stroke="#00f0ff" stroke-width="2" opacity="0.8"/>
+
+  <!-- Corner decorations -->
+  <path d="M 8 40 L 8 8 L 40 8" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+  <path d="M 216 8 L 248 8 L 248 40" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+  <path d="M 8 216 L 8 248 L 40 248" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+  <path d="M 216 248 L 248 248 L 248 216" fill="none" stroke="#00f0ff" stroke-width="2" filter="url(#glow)"/>
+
+  <!-- Main eye / magnifier symbol -->
+  <g transform="translate(128, 110)">
+    <!-- Outer ring -->
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#00f0ff" stroke-width="3" filter="url(#glow-strong)"/>
+    <!-- Inner ring -->
+    <circle cx="0" cy="0" r="45" fill="none" stroke="#00f0ff" stroke-width="1" opacity="0.6"/>
+    <!-- Scan line -->
+    <line x1="-50" y1="0" x2="50" y2="0" stroke="#00f0ff" stroke-width="1" opacity="0.4">
+      <animate attributeName="y1" values="-50;50;-50" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="y2" values="-50;50;-50" dur="3s" repeatCount="indefinite"/>
+    </line>
+    <!-- Center iris -->
+    <circle cx="0" cy="0" r="12" fill="#ff00e5" filter="url(#glow-strong)"/>
+    <circle cx="0" cy="0" r="6" fill="#0a0a12"/>
+    <!-- Pupil -->
+    <circle cx="0" cy="0" r="3" fill="#00f0ff" filter="url(#glow)"/>
+  </g>
+
+  <!-- Text: NEON DETECTIVE -->
+  <text x="128" y="205" text-anchor="middle" font-family="'Fira Code', monospace" font-size="18" font-weight="bold" fill="#00f0ff" letter-spacing="4" filter="url(#glow)">NEON DETECTIVE</text>
+  <text x="128" y="225" text-anchor="middle" font-family="'Noto Sans SC', sans-serif" font-size="10" fill="#8888aa" letter-spacing="2">赛博朋克侦探叙事</text>
+
+  <!-- Tech decorative lines -->
+  <line x1="20" y1="240" x2="80" y2="240" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+  <line x1="176" y1="240" x2="236" y2="240" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+  <rect x="110" y="238" width="36" height="4" fill="#ff00e5" opacity="0.6"/>
+</svg>

@@ -17,7 +17,7 @@
       "id": "scene_body",
       "name": "手术台区域",
       "description": "死者仰面躺在手术椅上，周围的手术器械散落一地。空气中弥漫着焦糊味和消毒水的刺鼻混合气息。手术灯还在亮着，把一切照得惨白。",
-      "bgImage": null,
+      "bgImage": "assets/bg/scene_body.svg",
       "hotspots": [
         {
           "id": "hotspot_body",
@@ -62,7 +62,7 @@
       "id": "scene_desk",
       "name": "工作台区域",
       "description": "陈老九的工作台上摆满了各种义体零件和工具。一台老旧但改装过的终端机还亮着屏幕，桌角的碎纸篓里似乎有些东西。",
-      "bgImage": null,
+      "bgImage": "assets/bg/scene_desk.svg",
       "hotspots": [
         {
           "id": "hotspot_terminal",

@@ -320,6 +320,43 @@ html, body {
   flex: 1;
 }
 
+/* Day4: 推理评分显示 */
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.05);
+  font-family: var(--font-mono);
+}
+
+.score-label {
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+}
+
+.score-value {
+  color: var(--neon-cyan);
+  font-size: 0.9rem;
+  font-weight: bold;
+  min-width: 3ch;
+  text-align: center;
+}
+
+/* Day4: 结束案件按钮 */
+.end-case-btn {
+  border-color: var(--neon-red);
+  color: var(--neon-red);
+  background: rgba(255, 0, 60, 0.08);
+}
+
+.end-case-btn:hover {
+  background: rgba(255, 0, 60, 0.2);
+  box-shadow: 0 0 15px rgba(255, 0, 60, 0.3);
+}
+
 /* ---------- Briefing Screen ---------- */
 #briefing-screen {
   background: var(--bg-dark);

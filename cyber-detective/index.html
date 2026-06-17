@@ -60,6 +60,10 @@
       <!-- 顶部信息栏 -->
       <div class="top-bar">
         <div class="phase-label">调查阶段</div>
+        <div class="score-display">
+          <span class="score-label">推理评分</span>
+          <span id="score-value" class="score-value">0</span>
+        </div>
         <button class="cyber-btn-sm" data-action="open-evidence">证据栏</button>
         <button class="cyber-btn-sm" data-action="go-interrogation">开始审讯</button>
       </div>
@@ -98,8 +102,13 @@
         <div class="interrogation-panel">
           <div class="top-bar">
             <div class="phase-label">审讯阶段</div>
+            <div class="score-display">
+              <span class="score-label">推理评分</span>
+              <span id="score-value-interrogation" class="score-value">0</span>
+            </div>
             <button class="cyber-btn-sm" data-action="open-evidence">证据栏</button>
             <button class="cyber-btn-sm" data-action="back-investigate">返回调查</button>
+            <button class="cyber-btn-sm end-case-btn" data-action="end-case">结束案件</button>
           </div>
           <!-- 嫌疑人选择器 -->
           <div id="suspect-selector" class="suspect-selector">
