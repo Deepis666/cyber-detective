@@ -27,7 +27,7 @@
       "description": "一封加密通讯记录，发件人为大型生物科技公司'新人类集团'安全部，收件人代号'北星'。内容提到：'陈老九已察觉实验数据外泄，建议启动清除计划'。",
       "type": "digital",
       "obtainedFrom": "scene_body",
-      "canCombineWith": ["evidence_002"],
+      "canCombineWith": ["evidence_002", "evidence_005"],
       "relatedTo": ["suspect_001", "suspect_003"]
     },
     {
