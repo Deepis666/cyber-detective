@@ -1,59 +1,59 @@
 {
   "caseId": "case_003",
   "title": "义体战争",
-  "_status": "skeleton - 待 B(AI架构师) 填充完整内容，C(美术) 填充角色/证据",
+  "_status": "complete - B(AI架构师) 已填充完整内容",
   "setting": {
-    "time": "TODO_B_填写时间",
-    "location": "TODO_B_填写地点（赛博反乌托邦/人体实验场所）",
-    "background": "TODO_B_填写案件背景：赛博反乌托邦，人体实验揭发"
+    "time": "2088年1月15日凌晨1:20",
+    "location": "新香港·下城区·废弃地铁站B3层·黑诊所",
+    "background": "下城区最大的非法义体改装诊所被发现，三名接受过'特价升级'的义体改造者在术后72小时内集体发疯，攻击了附近街区的居民。诊所内部一片狼藉——手术台上的血迹还没干透，但主刀医生已经消失。调查发现，这间诊所使用的义体零件全部来自同一个供应商，而这批零件中嵌入了未经申报的神经控制模块。"
   },
   "victim": {
-    "name": "TODO_B_受害者姓名",
-    "identity": "TODO_B_受害者身份",
-    "description": "TODO_B_受害者描述"
+    "name": "马三（化名）",
+    "identity": "诊所老板/非法义体改装师",
+    "description": "55岁，外号'三指马'，下城区最有名的义体改装师。他的诊所从不问客户来源，从不留手术记录。三周前开始接收一批'特供零件'，价格低到不正常。马三在暴走事件发生前4小时突然失踪，诊所的暗门后面是一间他从没让任何人进过的密室。"
   },
   "suspects": ["suspect_301", "suspect_302", "suspect_303"],
   "truth": {
     "killerId": "suspect_301",
-    "motive": "TODO_B_动机",
-    "weapon": "TODO_B_凶器",
+    "motive": "周铁手是锐义科技'创世纪'计划的义体供应链管理者。他通过马三的诊所将植入神经控制模块的义体零件分发到下城区，用于大规模的意识信号采集实验。马三发现了零件中的隐藏模块并试图勒索，周铁手在暴走事件制造混乱时趁乱将其灭口",
+    "weapon": "义体控制模块过载——远程激活马三自身的神经接口，导致脑干功能衰竭",
     "keyEvidence": ["evidence_301", "evidence_302"]
   },
   "scenes": {
     "scene_301": {
       "id": "scene_301",
-      "name": "TODO_B_场景1名称",
-      "description": "TODO_B_场景1描述",
+      "name": "黑诊所·手术区",
+      "description": "废弃地铁站改造的诊所弥漫着消毒水和烧焦电路的混合气味。三张手术台上的束缚带被挣断，地面散落着还沾着血的义体零件。角落的冰柜里整齐排列着植入体样本，每个都贴着编号——但不是马三的手写标签，而是打印的条码，格式与锐义科技的产品编号完全一致。",
       "bgImage": "assets/bg/case003_scene_1.png",
       "hotspots": [
-        { "id": "examine_301", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_301", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
-        { "id": "move_301", "label": "TODO_B_移动", "type": "move", "targetScene": "scene_302", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+        { "id": "examine_301", "label": "检查冰柜中的义体零件", "type": "evidence", "evidenceId": "evidence_301", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_301", "label": "进入密室", "type": "move", "targetScene": "scene_302", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
       ]
     },
     "scene_302": {
       "id": "scene_302",
-      "name": "TODO_B_场景2名称",
-      "description": "TODO_B_场景2描述",
+      "name": "密室·数据站",
+      "description": "暗门后面是一间不可思议的空间——六块全息屏围成半圆，每块屏幕上都是实时的人体神经信号波形图。中间的操作台上放着一台改装过的信号中继器，外壳上蚀刻着锐义科技的logo。墙上贴着一张手写的时间表：三周内的每一次手术，每一个植入体的接收者，以及一个用红笔圈出的词——'创世纪·第三阶段'。",
       "bgImage": "assets/bg/case003_scene_2.png",
       "hotspots": [
-        { "id": "examine_302", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_302", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
-        { "id": "move_302", "label": "TODO_B_移动", "type": "move", "targetScene": "scene_303", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+        { "id": "examine_302", "label": "检查信号中继器", "type": "evidence", "evidenceId": "evidence_302", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_302", "label": "前往零件仓库", "type": "move", "targetScene": "scene_303", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
       ]
     },
     "scene_303": {
       "id": "scene_303",
-      "name": "TODO_B_场景3名称",
-      "description": "TODO_B_场景3描述",
+      "name": "B4层·零件仓库",
+      "description": "地铁站更下一层被改成了零件仓库。货架上的箱子印着锐义科技的物流编码，但收货地址写的是一家早已注销的'新港义体配件商行'。箱子里的义体零件表面看不出异常，但用检测仪扫描后，每个零件的核心芯片旁边都多出一块米粒大小的黑色模块——不在任何产品规格表上。",
       "bgImage": "assets/bg/case003_scene_3.png",
       "hotspots": [
-        { "id": "examine_303", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_303", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
-        { "id": "move_303", "label": "返回场景1", "type": "move", "targetScene": "scene_301", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
+        { "id": "examine_303", "label": "扫描隐藏控制模块", "type": "evidence", "evidenceId": "evidence_303", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
+        { "id": "move_303", "label": "返回手术区", "type": "move", "targetScene": "scene_301", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
       ]
     }
   },
   "endings": {
-    "ending_good": { "condition": "score >= 80", "title": "TODO_B_好结局标题", "description": "TODO_B_好结局描述" },
-    "ending_normal": { "condition": "score >= 40", "title": "TODO_B_普通结局标题", "description": "TODO_B_普通结局描述" },
-    "ending_bad": { "condition": "score < 40", "title": "TODO_B_坏结局标题", "description": "TODO_B_坏结局描述" }
+    "ending_good": { "condition": "score >= 80", "title": "断头台", "description": "你找到了隐藏控制模块的完整供应链——从锐义科技的芯片工厂到周铁手的分销网络再到马三的诊所。信号中继器里的实时数据证明了'创世纪'正在进行大规模意识信号采集。周铁手在铁证面前无路可退，交代了锐义科技利用下城区居民做人体实验的全过程。" },
+    "ending_normal": { "condition": "score >= 40", "title": "半截刀刃", "description": "你封存了黑诊所并查获了非法义体零件，但信号中继器的数据已经被远程擦除。周铁手销声匿迹，马三的尸体在一周后被发现漂在下城区的排污渠里。义体黑市在短暂沉寂后重新开张——换了供货商，但零件上的隐藏模块依然存在。" },
+    "ending_bad": { "condition": "score < 40", "title": "锈蚀", "description": "黑诊所在你到达前被彻底焚毁，所有物理证据化为灰烬。暴走事件被媒体定性为'劣质义体导致的群体性精神障碍'。锐义科技发表声明'深表遗憾'并宣布向下城区义体改造者提供'安全升级补贴'——用的正是同一批嵌入了控制模块的零件。" }
   }
 }

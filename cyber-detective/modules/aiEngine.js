@@ -270,8 +270,8 @@ export async function interrogateAI(params) {
 
   // 构建变量
   const caseTruth = _caseData?.truth
-    ? `凶手：${_caseData.truth.killerId === suspectId ? '就是此嫌疑人' : '不是此嫌疑人'}。动机：${_caseData.truth.motive}。凶器：${_caseData.truth.weapon}。时间线：${_caseData.truth.timeline}`
-    : '陈老九被林小北用改装电磁脉冲注射器击杀';
+    ? `凶手：${_caseData.truth.killerId === suspectId ? '就是此嫌疑人' : '不是此嫌疑人'}。动机：${_caseData.truth.motive}。凶器：${_caseData.truth.weapon}。关键证据：${_caseData.truth.keyEvidence?.join('、') || '未知'}`
+    : '案件真相数据缺失';
 
   const variables = {
     caseTruth,
@@ -319,7 +319,7 @@ export async function evidenceCombineAI(params) {
   const ev2Data = _evidenceData?.evidence?.find(e => e.id === ev2);
 
   const variables = {
-    caseBackground: `案件：${_caseData?.title || '霓虹公寓谋杀案'}。${_caseData?.setting?.background || ''}`,
+    caseBackground: `${_caseData?.title || '未知案件'}：${_caseData?.setting?.background || '案件背景缺失'}`,
     obtainedEvidence: state.evidenceObtained.map(id => {
       const ev = _evidenceData?.evidence?.find(e => e.id === id);
       return ev ? `${ev.name}(${ev.type})` : id;
@@ -363,7 +363,7 @@ export async function investigateAI(params) {
   const scene = _caseData?.scenes?.[sceneId];
 
   const variables = {
-    caseBackground: `案件：${_caseData?.title || '霓虹公寓谋杀案'}。${_caseData?.setting?.background || ''}`,
+    caseBackground: `${_caseData?.title || '未知案件'}：${_caseData?.setting?.background || '案件背景缺失'}`,
     sceneName: scene?.name || sceneId,
     sceneDescription: scene?.description || '一间阴暗的房间',
     playerAction: action,
@@ -395,15 +395,80 @@ export async function investigateAI(params) {
 }
 
 /**
- * 生成结局文本（AI 接口，Day4 完善）
+ * 生成结局文本（AI 接口）
  * @param {Object} params
+ *   @prop {string} endingType - 'ending_good' | 'ending_normal' | 'ending_bad'
+ *   @prop {string} endingTitle - 结局标题
+ *   @prop {number} finalScore - 最终评分
+ *   @prop {string} playerChoices - 玩家关键选择描述
  * @returns {Promise<Object>}
  */
 export async function generateEndingAI(params) {
-  // Day4 完整实现
+  const { endingType, endingTitle, finalScore, playerChoices } = params;
+  const state = getState();
+
+  // 构建嫌疑人摘要
+  const suspectsSummary = _caseData?.suspects?.map(sid => {
+    const ch = _charactersData?.characters?.find(c => c.id === sid);
+    if (!ch) return `${sid}: 未知`;
+    const isKiller = _caseData?.truth?.killerId === sid;
+    return `${ch.name}（${ch.identity}）${isKiller ? '【真凶】' : ''}：${ch.personality || ''}`;
+  }).join('\n') || '嫌疑人数据缺失';
+
+  // 构建案件真相
+  const caseTruth = _caseData?.truth
+    ? `真凶：${_caseData.truth.killerId}。动机：${_caseData.truth.motive}。凶器/手段：${_caseData.truth.weapon}。关键证据：${_caseData.truth.keyEvidence?.join('、') || '未知'}`
+    : '案件真相数据缺失';
+
+  const variables = {
+    caseTruth,
+    suspectsSummary,
+    endingType: endingType || 'ending_normal',
+    endingTitle: endingTitle || '未知结局',
+    finalScore: String(finalScore || 0),
+    playerChoices: playerChoices || '玩家完成了调查。'
+  };
+
+  const prompt = await loadPrompt('ending', variables);
+  const aiResult = await callAPI(prompt);
+
+  if (aiResult && aiResult.endingText) {
+    return aiResult;
+  }
+
+  // 离线模式回退
   return {
-    endingText: '案件终于落下帷幕...',
-    epilogue: '新香港下城区的霓虹灯依旧闪烁。'
+    endingText: '案件终于落下帷幕。无论结果如何，新香港的霓虹灯依旧闪烁，而下城区的人们继续在阴影中前行。',
+    epilogue: '新香港下城区某条加密频道：案件已归档。'
+  };
+}
+
+/**
+ * 主线剧情旁白（AI 接口）
+ * @param {Object} params
+ *   @prop {string} currentSituation - 当前局势描述
+ *   @prop {string} casesSummary - 已结案件摘要
+ * @returns {Promise<Object>}
+ */
+export async function plotNarrateAI(params) {
+  const { currentSituation, casesSummary } = params;
+
+  const variables = {
+    currentSituation: currentSituation || '侦探正在事务所中整理线索。',
+    casesSummary: casesSummary || '尚无已结案件。'
+  };
+
+  const prompt = await loadPrompt('plotNarration', variables);
+  const aiResult = await callAPI(prompt);
+
+  if (aiResult && aiResult.narration) {
+    return aiResult;
+  }
+
+  // 离线模式回退
+  return {
+    narration: '事务所的终端机安静地运转着，等待下一个案件的简报。',
+    suggestion: '查看是否有新的案件可以接受。'
   };
 }
 
