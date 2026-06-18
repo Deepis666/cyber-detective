@@ -1,0 +1,43 @@
+{
+  "caseId": "case_004",
+  "title": "最后的真相",
+  "_status": "skeleton - 隐藏案件，需前3案全好结局(score>=80)解锁。待 B(AI架构师) 填充完整内容",
+  "isHidden": true,
+  "unlockCondition": {
+    "allCasesGoodEnding": true,
+    "minScore": 80
+  },
+  "setting": {
+    "time": "TODO_B_填写时间",
+    "location": "TODO_B_填写地点（幕后黑手据点）",
+    "background": "TODO_B_填写案件背景：直面幕后黑手，系统对抗"
+  },
+  "victim": {
+    "name": "TODO_B_受害者姓名",
+    "identity": "TODO_B_受害者身份",
+    "description": "TODO_B_受害者描述"
+  },
+  "suspects": ["suspect_401"],
+  "truth": {
+    "killerId": "suspect_401",
+    "motive": "TODO_B_动机",
+    "weapon": "TODO_B_凶器",
+    "keyEvidence": ["evidence_401"]
+  },
+  "scenes": {
+    "scene_401": {
+      "id": "scene_401",
+      "name": "TODO_B_场景名称",
+      "description": "TODO_B_场景描述",
+      "bgImage": "assets/bg/case004_scene_1.png",
+      "hotspots": [
+        { "id": "examine_401", "label": "TODO_B_热点", "type": "evidence", "evidenceId": "evidence_401", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true }
+      ]
+    }
+  },
+  "endings": {
+    "ending_good": { "condition": "score >= 80", "title": "TODO_B_好结局标题", "description": "TODO_B_好结局描述" },
+    "ending_normal": { "condition": "score >= 40", "title": "TODO_B_普通结局标题", "description": "TODO_B_普通结局描述" },
+    "ending_bad": { "condition": "score < 40", "title": "TODO_B_坏结局标题", "description": "TODO_B_坏结局描述" }
+  }
+}

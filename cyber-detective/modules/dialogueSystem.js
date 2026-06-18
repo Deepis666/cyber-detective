@@ -14,12 +14,6 @@ import { addDialogueToHistory, getDialogueHistory as getStateHistory } from './g
 let _elements = {};
 
 // ====================
-// 对话队列
-// ====================
-let _dialogueQueue = [];
-let _isPlaying = false;
-let _currentCallback = null;
-
 // 打字机效果状态
 let _typewriterTimer = null;
 let _typewriterResolve = null;

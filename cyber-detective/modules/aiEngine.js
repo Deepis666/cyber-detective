@@ -41,6 +41,16 @@ export function initAIEngine(charactersData, evidenceData, caseData) {
 }
 
 /**
+ * 动态切换案件上下文（多案件扩展）
+ * 在 startCase 时调用，更新 AI 引擎当前引用的案件数据
+ * @param {Object} caseData - 新案件数据
+ */
+export function setAIEngineCaseContext(caseData) {
+  _caseData = caseData;
+  console.log(`[aiEngine] 案件上下文已切换: ${caseData?.caseId || '未知'}`);
+}
+
+/**
  * 检查 API 是否可用
  * @returns {boolean}
  */
@@ -90,6 +100,22 @@ const PRESET_RESPONSES = {
         { response: "好吧，涅槃是我的项目。但陈老九的死和我没有关系！我只是出资方，动手的事从来不是我做的！你们应该去查他的助手——林小北！", emotion: "broken", stressDelta: -5, hasContradiction: true, newClue: "赵明月承认涅槃项目存在" },
         { response: "我承认我出钱让陈老九做意识覆盖实验。但我没让他死！他拿着实验数据来勒索我...我是说，他想要更多的资金。然后他就死了。这和我没关系。", emotion: "broken", stressDelta: -8, hasContradiction: true, newClue: "赵明月承认出资+勒索关系" },
         { response: "是...我让陈老九做实验。但'意识覆盖'是技术突破，不是犯罪！只要不被人发现...可那个蠢货竟然要把数据卖掉！我没有杀他，但我承认...我松了一口气。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "赵明月在陈老九死后感到如释重负" }
+      ]
+    },
+    suspect_003: {
+      calm: [
+        { response: "陈老九是我的老主顾了，我们合作有五年多了。他这人手艺不错，就是嘴巴不太严。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
+        { response: "下城区的生意嘛，你懂的，大家都在灰色地带讨生活。但我从没碰过带血的钱。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
+        { response: "你是说那批神经接口？就是普通的二手货，我进货都有记录的。不信你自己看。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null }
+      ],
+      nervous: [
+        { response: "军...军用级？你开玩笑吧？那种东西我一个小小的零件贩子怎么可能搞得到？", emotion: "nervous", stressDelta: 10, hasContradiction: true, newClue: "钱一鸣否认经手军用级零件" },
+        { response: "陈老九要的那批货...好吧，确实有点特殊。但他只说是给大客户备的，我哪知道他要用来干嘛？", emotion: "nervous", stressDelta: 8, hasContradiction: true, newClue: "陈老九曾向钱一鸣订购特殊神经接口组件" },
+        { response: "新人类集团？我没和他们打过交道...好吧，偶尔有几个跑单帮的业务员找我拿过货，但就这些。", emotion: "nervous", stressDelta: 6, hasContradiction: true, newClue: "钱一鸣与新人类集团有间接业务往来" }
+      ],
+      broken: [
+        { response: "行，我认了。那批货是从新人类的废品仓里流出来的——军用级神经接口组件。陈老九给的价钱让我没法拒绝...但我真不知道他要用那个杀人！我只是个做买卖的！", emotion: "broken", stressDelta: -5, hasContradiction: true, newClue: "钱一鸣承认提供军用级零件" },
+        { response: "他死前两天来找过我，说需要一批'特殊规格'的电磁脉冲模块。我告诉他那种东西被盯得很紧...但他执意要，还给了我双倍的钱。我...我当时缺钱，就没多问。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "陈老九案发前向钱一鸣购买电磁脉冲模块" }
       ]
     }
   },

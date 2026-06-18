@@ -28,21 +28,21 @@ const AUDIO_CONFIG = {
 // ====================
 const AUDIO_MAP = {
   bgm: {
-    investigation: 'assets/audio/bgm_investigation.mp3',
-    interrogation: 'assets/audio/bgm_interrogation.mp3',
-    menu: 'assets/audio/bgm_menu.mp3',
-    ending: 'assets/audio/bgm_ending.mp3'
+    investigation: 'assets/audio/bgm_investigation.wav',
+    interrogation: 'assets/audio/bgm_interrogation.wav',
+    menu: 'assets/audio/bgm_menu.wav',
+    ending: 'assets/audio/bgm_ending.wav'
   },
   sfx: {
-    evidence_obtain: 'assets/audio/sfx_evidence.mp3',
-    evidence_combine: 'assets/audio/sfx_combine.mp3',
-    click: 'assets/audio/sfx_click.mp3',
-    contradiction: 'assets/audio/sfx_contradiction.mp3',
-    stress_up: 'assets/audio/sfx_stress.mp3'
+    evidence_obtain: 'assets/audio/sfx_evidence.wav',
+    evidence_combine: 'assets/audio/sfx_combine.wav',
+    click: 'assets/audio/sfx_click.wav',
+    contradiction: 'assets/audio/sfx_contradiction.wav',
+    stress_up: 'assets/audio/sfx_stress.wav'
   },
   voice: {
-    suspect_001_opening: 'assets/audio/voice_lin_opening.mp3',
-    suspect_002_opening: 'assets/audio/voice_zhao_opening.mp3'
+    suspect_001_opening: 'assets/audio/voice_lin_opening.wav',
+    suspect_002_opening: 'assets/audio/voice_zhao_opening.wav'
   }
 };
 

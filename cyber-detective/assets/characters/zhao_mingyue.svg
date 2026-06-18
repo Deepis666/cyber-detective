@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320">
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a12"/>
+      <stop offset="100%" stop-color="#2a0a1a"/>
+    </linearGradient>
+    <linearGradient id="cyber2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff003c"/>
+      <stop offset="100%" stop-color="#b400ff"/>
+    </linearGradient>
+    <filter id="glow2" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="240" height="320" fill="url(#bg2)"/>
+  <!-- 网格背景 -->
+  <path d="M0 80 L240 80 M0 160 L240 160 M0 240 L240 240" stroke="#b400ff" stroke-opacity="0.08" stroke-width="1"/>
+  <path d="M80 0 L80 320 M160 0 L160 320" stroke="#b400ff" stroke-opacity="0.08" stroke-width="1"/>
+  <!-- 人物剪影 -->
+  <ellipse cx="120" cy="105" rx="42" ry="52" fill="#1a0a14" stroke="url(#cyber2)" stroke-width="2"/>
+  <path d="M78 150 L70 290 L170 290 L162 150 Q162 132 120 132 Q78 132 78 150" fill="#140a10" stroke="url(#cyber2)" stroke-width="2"/>
+  <!-- 义体眼 -->
+  <circle cx="108" cy="100" r="6" fill="#ff003c" filter="url(#glow2)"/>
+  <circle cx="108" cy="100" r="2" fill="#ffffff"/>
+  <circle cx="132" cy="100" r="6" fill="#b400ff" filter="url(#glow2)"/>
+  <circle cx="132" cy="100" r="2" fill="#ffffff"/>
+  <!-- 神经加速器纹路 -->
+  <path d="M90 130 L120 145 L150 130" stroke="#ff003c" stroke-width="1.5" fill="none" filter="url(#glow2)"/>
+  <!-- 标签 -->
+  <rect x="20" y="285" width="200" height="25" fill="rgba(0,0,0,0.6)" stroke="#b400ff" stroke-width="1"/>
+  <text x="120" y="302" font-family="monospace" font-size="14" fill="#ff003c" text-anchor="middle" letter-spacing="2">赵明月 / ZHAO MINGYUE</text>
+</svg>

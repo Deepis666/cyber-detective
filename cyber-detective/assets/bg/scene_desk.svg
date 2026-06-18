@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <!-- Scene: Work Desk (scene_desk) - Cyberpunk Workshop -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a12"/>
+      <stop offset="50%" style="stop-color:#120a1a"/>
+      <stop offset="100%" style="stop-color:#1a0a2e"/>
+    </linearGradient>
+    <linearGradient id="deskGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#141428"/>
+      <stop offset="100%" style="stop-color:#0a0a12"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glow-small" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0,240,255,0.04)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1920" height="1080" fill="url(#bgGrad)"/>
+  <rect width="1920" height="1080" fill="url(#grid)"/>
+
+  <!-- Work desk (center-bottom) -->
+  <g transform="translate(960, 700)">
+    <!-- Desk surface -->
+    <rect x="-400" y="0" width="800" height="200" fill="url(#deskGrad)" stroke="rgba(0,240,255,0.2)" stroke-width="1"/>
+    <!-- Desk edge glow -->
+    <line x1="-400" y1="0" x2="400" y2="0" stroke="#00f0ff" stroke-width="2" opacity="0.4" filter="url(#glow-small)"/>
+    <!-- Computer terminal -->
+    <rect x="-150" y="-120" width="300" height="120" rx="4" fill="#0a0a12" stroke="#00f0ff" stroke-width="2" filter="url(#glow-small)"/>
+    <rect x="-140" y="-110" width="280" height="100" fill="rgba(0,240,255,0.05)"/>
+    <!-- Screen content -->
+    <line x1="-120" y1="-90" x2="80" y2="-90" stroke="#00f0ff" stroke-width="2" opacity="0.6"/>
+    <line x1="-120" y1="-75" x2="60" y2="-75" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+    <line x1="-120" y1="-60" x2="100" y2="-60" stroke="#ff00e5" stroke-width="1" opacity="0.5"/>
+    <line x1="-120" y1="-45" x2="40" y2="-45" stroke="#00f0ff" stroke-width="1" opacity="0.3"/>
+    <text x="0" y="-20" text-anchor="middle" font-family="monospace" font-size="12" fill="#39ff14" opacity="0.6">[ENCRYPTED]</text>
+    <!-- Keyboard -->
+    <rect x="-100" y="10" width="200" height="30" rx="2" fill="#0d0d1a" stroke="rgba(0,240,255,0.2)" stroke-width="1"/>
+    <!-- Key rows -->
+    <line x1="-90" y1="18" x2="90" y2="18" stroke="rgba(0,240,255,0.2)" stroke-width="1" stroke-dasharray="8,4"/>
+    <line x1="-90" y1="28" x2="90" y2="28" stroke="rgba(0,240,255,0.2)" stroke-width="1" stroke-dasharray="8,4"/>
+    <!-- Data chip (center) -->
+    <rect x="-20" y="50" width="40" height="25" rx="2" fill="#1a1a2e" stroke="#ff00e5" stroke-width="1" filter="url(#glow-small)"/>
+    <rect x="-15" y="55" width="30" height="3" fill="#ff00e5" opacity="0.6"/>
+    <rect x="-15" y="62" width="20" height="3" fill="#ff00e5" opacity="0.4"/>
+  </g>
+
+  <!-- Tool rack (left wall) -->
+  <g transform="translate(150, 300)">
+    <rect x="0" y="0" width="80" height="400" fill="#0d0d1a" stroke="rgba(0,240,255,0.1)" stroke-width="1"/>
+    <!-- Tool silhouettes -->
+    <rect x="10" y="20" width="60" height="8" rx="2" fill="#8888aa" opacity="0.4"/>
+    <rect x="10" y="50" width="60" height="8" rx="2" fill="#00f0ff" opacity="0.3"/>
+    <rect x="10" y="80" width="60" height="8" rx="2" fill="#8888aa" opacity="0.4"/>
+    <rect x="10" y="110" width="60" height="8" rx="2" fill="#8888aa" opacity="0.4"/>
+    <rect x="10" y="140" width="60" height="8" rx="2" fill="#8888aa" opacity="0.4"/>
+    <!-- Missing tool slot (glows) -->
+    <rect x="10" y="170" width="60" height="8" rx="2" fill="none" stroke="#ff00e5" stroke-width="1" opacity="0.6" filter="url(#glow-small)"/>
+    <text x="40" y="165" text-anchor="middle" font-family="monospace" font-size="8" fill="#ff00e5" opacity="0.6">MISSING</text>
+  </g>
+
+  <!-- Shredded paper / Trash (right desk) -->
+  <g transform="translate(1300, 720)">
+    <rect x="0" y="0" width="50" height="40" rx="2" fill="#0d0d1a" stroke="rgba(0,240,255,0.2)" stroke-width="1"/>
+    <!-- Paper scraps -->
+    <rect x="5" y="5" width="15" height="10" fill="#e0e0f0" opacity="0.15" transform="rotate(10)"/>
+    <rect x="20" y="15" width="20" height="8" fill="#e0e0f0" opacity="0.1" transform="rotate(-5)"/>
+    <rect x="10" y="25" width="18" height="12" fill="#e0e0f0" opacity="0.12" transform="rotate(20)"/>
+  </g>
+
+  <!-- Neon tubes (ceiling) -->
+  <rect x="300" y="80" width="200" height="3" fill="#00f0ff" filter="url(#glow)" opacity="0.5"/>
+  <rect x="1200" y="80" width="200" height="3" fill="#ff00e5" filter="url(#glow)" opacity="0.4"/>
+  <rect x="700" y="100" width="100" height="2" fill="#39ff14" filter="url(#glow)" opacity="0.3"/>
+
+  <!-- Wall shelves with parts -->
+  <g transform="translate(1600, 250)">
+    <rect x="0" y="0" width="200" height="10" fill="#141428" stroke="rgba(0,240,255,0.1)" stroke-width="1"/>
+    <rect x="20" y="-30" width="30" height="30" rx="2" fill="#1a1a2e" stroke="#8888aa" stroke-width="1" opacity="0.5"/>
+    <rect x="60" y="-20" width="25" height="20" rx="2" fill="#1a1a2e" stroke="#8888aa" stroke-width="1" opacity="0.5"/>
+    <circle cx="120" cy="-10" r="12" fill="#1a1a2e" stroke="#00f0ff" stroke-width="1" opacity="0.4"/>
+    <rect x="150" y="-25" width="20" height="25" rx="2" fill="#1a1a2e" stroke="#8888aa" stroke-width="1" opacity="0.5"/>
+  </g>
+
+  <!-- Vignette -->
+  <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" style="stop-color:transparent"/>
+    <stop offset="100%" style="stop-color:rgba(0,0,0,0.5)"/>
+  </radialGradient>
+  <rect width="1920" height="1080" fill="url(#vignette)"/>
+
+  <!-- Corner HUD -->
+  <path d="M 20 20 L 80 20 L 80 30" fill="none" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+  <path d="M 1900 20 L 1840 20 L 1840 30" fill="none" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+  <path d="M 20 1060 L 80 1060 L 80 1050" fill="none" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+  <path d="M 1900 1060 L 1840 1060 L 1840 1050" fill="none" stroke="#00f0ff" stroke-width="1" opacity="0.5"/>
+
+  <!-- Scanlines -->
+  <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
+    <line x1="0" y1="0" x2="4" y2="0" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+  </pattern>
+  <rect width="1920" height="1080" fill="url(#scanlines)" pointer-events="none"/>
+</svg>

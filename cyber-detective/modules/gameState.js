@@ -1,8 +1,11 @@
 /**
- * gameState.js - 全局状态管理
+ * gameState.js - 全局状态管理（双层状态架构）
  * 赛博朋克侦探叙事游戏
  *
- * 负责管理游戏所有运行时状态，提供统一的读写接口。
+ * 状态分为两层：
+ *   - 跨案件层（持久化，不随案件切换重置）：gamePhase / currentCaseIndex / casesResults / unlockedHiddenCase / globalFlags
+ *   - 单案件层（切换案件时重置）：currentPhase / currentScene / currentSuspect / evidenceObtained / stressLevel / score ...
+ *
  * 状态变更通过 updateState/专用方法进行，支持 LocalStorage 持久化。
  */
 
@@ -16,23 +19,40 @@ const STRESS_EMOTION_THRESHOLD = {
   broken: { min: 67, max: 100 }
 };
 
+// 主线案件数量（不含隐藏案件）
+const TOTAL_MAIN_CASES = 3;
+// 好结局分数阈值
+const GOOD_ENDING_SCORE = 80;
+
 // ====================
-// 默认状态
+// 单案件层默认状态（切换案件时重置为此）
 // ====================
-const defaultState = {
+const defaultSingleCaseState = {
   currentPhase: 'intro',       // 'intro' | 'investigate' | 'interrogation' | 'ending'
   currentScene: null,          // 当前调查场景 ID
   currentSuspect: null,        // 当前审讯嫌疑人 ID
   evidenceObtained: [],        // 已获得证据 ID 列表
   evidenceExamined: [],        // 已查看证据 ID 列表
   dialogueHistory: [],         // 对话历史（用于 AI 上下文）
-  stressLevel: {               // 各嫌疑人压力值 0-100
-    suspect_001: 0,
-    suspect_002: 0
-  },
+  stressLevel: {},             // 各嫌疑人压力值 0-100（按案件动态填充）
   score: 0,                    // 推理评分
   endingTriggered: null,       // 触发的结局 ID
-  flags: {}                    // 剧情标记
+  flags: {}                    // 单案件剧情标记
+};
+
+// ====================
+// 完整默认状态（跨案件层 + 单案件层）
+// ====================
+const defaultState = {
+  // === 跨案件层 ===
+  gamePhase: 'menu',           // 'menu'|'briefing'|'investigate'|'interrogation'|'hub'|'ending'|'final_ending'
+  currentCaseIndex: -1,        // 当前案件序号 0/1/2/3（-1 表示未开始）
+  casesResults: [],            // [{ caseId, ending, score, keyFlags }]
+  unlockedHiddenCase: false,   // 是否解锁隐藏案件
+  globalFlags: {},             // 跨案件剧情标记
+
+  // === 单案件层 ===
+  ...JSON.parse(JSON.stringify(defaultSingleCaseState))
 };
 
 // ====================
@@ -74,7 +94,7 @@ function _deepClone(obj) {
 }
 
 // ====================
-// Public API
+// Public API - 基础读写
 // ====================
 
 /**
@@ -97,7 +117,7 @@ export function updateState(patch) {
   }
 
   // 特殊处理数组字段：替换而非合并
-  const arrayKeys = ['evidenceObtained', 'evidenceExamined', 'dialogueHistory'];
+  const arrayKeys = ['evidenceObtained', 'evidenceExamined', 'dialogueHistory', 'casesResults'];
   for (const key of arrayKeys) {
     if (patch[key] !== undefined) {
       _state[key] = patch[key];
@@ -106,7 +126,7 @@ export function updateState(patch) {
   }
 
   // 特殊处理嵌套对象：浅合并
-  const objectKeys = ['stressLevel', 'flags'];
+  const objectKeys = ['stressLevel', 'flags', 'globalFlags'];
   for (const key of objectKeys) {
     if (patch[key] !== undefined && typeof patch[key] === 'object') {
       _state[key] = { ..._state[key], ...patch[key] };
@@ -120,6 +140,10 @@ export function updateState(patch) {
   _notify(patch);
   return getState();
 }
+
+// ====================
+// Public API - 单案件层操作
+// ====================
 
 /**
  * 添加证据
@@ -157,7 +181,6 @@ export function markEvidenceExamined(evidenceId) {
  */
 export function addStress(suspectId, delta) {
   if (!_state.stressLevel.hasOwnProperty(suspectId)) {
-    console.warn(`[gameState] addStress: unknown suspect ${suspectId}`);
     _state.stressLevel[suspectId] = 0;
   }
 
@@ -203,7 +226,7 @@ export function addScore(delta) {
 }
 
 /**
- * 设置剧情标记
+ * 设置单案件剧情标记
  * @param {string} flag
  * @param {any} value
  */
@@ -213,12 +236,31 @@ export function setFlag(flag, value) {
 }
 
 /**
- * 获取剧情标记
+ * 获取单案件剧情标记
  * @param {string} flag
  * @returns {any}
  */
 export function getFlag(flag) {
   return _state.flags[flag];
+}
+
+/**
+ * 设置跨案件剧情标记
+ * @param {string} flag
+ * @param {any} value
+ */
+export function setGlobalFlag(flag, value) {
+  _state.globalFlags[flag] = value;
+  _notify({ globalFlags: { [flag]: value } });
+}
+
+/**
+ * 获取跨案件剧情标记
+ * @param {string} flag
+ * @returns {any}
+ */
+export function getGlobalFlag(flag) {
+  return _state.globalFlags[flag];
 }
 
 /**
@@ -252,7 +294,7 @@ export function clearDialogueHistory() {
 }
 
 /**
- * 设置当前阶段
+ * 设置当前阶段（单案件层）
  * @param {string} phase - 'intro' | 'investigate' | 'interrogation' | 'ending'
  */
 export function setPhase(phase) {
@@ -287,17 +329,170 @@ export function setEnding(endingId) {
   _notify({ endingTriggered: endingId });
 }
 
+// ====================
+// Public API - 跨案件层操作（多案件扩展新增）
+// ====================
+
 /**
- * 重置状态到默认
+ * 设置游戏全局阶段（跨案件层）
+ * @param {string} phase - 'menu'|'briefing'|'investigate'|'interrogation'|'hub'|'ending'|'final_ending'
  */
-export function resetState() {
-  _state = JSON.parse(JSON.stringify(defaultState));
+export function setGamePhase(phase) {
+  _state.gamePhase = phase;
+  _notify({ gamePhase: phase });
+}
+
+/**
+ * 获取游戏全局阶段
+ * @returns {string}
+ */
+export function getGamePhase() {
+  return _state.gamePhase;
+}
+
+/**
+ * 获取当前案件序号
+ * @returns {number}
+ */
+export function getCurrentCaseIndex() {
+  return _state.currentCaseIndex;
+}
+
+/**
+ * 获取所有案件结果
+ * @returns {Array}
+ */
+export function getCasesResults() {
+  return _deepClone(_state.casesResults);
+}
+
+/**
+ * 获取指定案件结果
+ * @param {number} caseIndex
+ * @returns {Object|null}
+ */
+export function getCaseResult(caseIndex) {
+  return _state.casesResults[caseIndex] || null;
+}
+
+/**
+ * 初始化新案件的嫌疑人压力值
+ * @param {Array<string>} suspectIds
+ */
+export function initSuspectStress(suspectIds) {
+  _state.stressLevel = {};
+  suspectIds.forEach(id => {
+    _state.stressLevel[id] = 0;
+  });
+  _notify({ stressLevel: _state.stressLevel });
+}
+
+/**
+ * 开始一个新案件（重置单案件层，保留跨案件层）
+ * @param {number} caseIndex - 案件序号 0/1/2/3
+ * @returns {Object} 重置后的完整状态
+ */
+export function startNewCase(caseIndex) {
+  // 保留跨案件层字段
+  const crossCase = {
+    gamePhase: _state.gamePhase,
+    currentCaseIndex: caseIndex,
+    casesResults: _state.casesResults,
+    unlockedHiddenCase: _state.unlockedHiddenCase,
+    globalFlags: _state.globalFlags
+  };
+
+  // 重置单案件层
+  _state = {
+    ...crossCase,
+    ...JSON.parse(JSON.stringify(defaultSingleCaseState))
+  };
+
+  console.log(`[gameState] 开始新案件: caseIndex=${caseIndex}`);
   _notify({});
+  return getState();
+}
+
+/**
+ * 记录当前案件结果（结案时调用）
+ * @param {Object} result - { caseId, ending, score, keyFlags }
+ * @returns {Object} 更新后的 casesResults
+ */
+export function recordCaseResult(result) {
+  const caseIndex = _state.currentCaseIndex;
+  // 确保 casesResults 数组长度足够
+  while (_state.casesResults.length <= caseIndex) {
+    _state.casesResults.push(null);
+  }
+  _state.casesResults[caseIndex] = {
+    caseId: result.caseId,
+    ending: result.ending,
+    score: result.score || _state.score,
+    keyFlags: result.keyFlags || {},
+    completedAt: new Date().toISOString()
+  };
+
+  _notify({ casesResults: _state.casesResults });
+  console.log(`[gameState] 记录案件结果: case ${caseIndex} => ${result.ending} (score ${result.score})`);
+  return getCasesResults();
+}
+
+/**
+ * 检查是否解锁隐藏案件（前3个主线案件全部达成好结局）
+ * @returns {boolean} 是否解锁
+ */
+export function checkHiddenCaseUnlock() {
+  // 检查前 TOTAL_MAIN_CASES 个案件是否全部达成好结局
+  if (_state.casesResults.length < TOTAL_MAIN_CASES) {
+    _state.unlockedHiddenCase = false;
+    return false;
+  }
+
+  const allGood = _state.casesResults
+    .slice(0, TOTAL_MAIN_CASES)
+    .every(r => r && r.ending === 'ending_good' && r.score >= GOOD_ENDING_SCORE);
+
+  _state.unlockedHiddenCase = allGood;
+  _notify({ unlockedHiddenCase: allGood });
+  console.log(`[gameState] 隐藏案件解锁检查: ${allGood ? '已解锁' : '未达成'}`);
+  return allGood;
+}
+
+/**
+ * 获取最终结局类型（根据全部案件结果累积）
+ * @returns {string} 'all_good' | 'mixed' | 'all_bad'
+ */
+export function getFinalEndingType() {
+  const results = _state.casesResults.slice(0, TOTAL_MAIN_CASES);
+  if (results.length < TOTAL_MAIN_CASES) return 'mixed';
+
+  const allGood = results.every(r => r && r.ending === 'ending_good');
+  const allBad = results.every(r => r && r.ending === 'ending_bad');
+
+  if (allGood) return 'all_good';
+  if (allBad) return 'all_bad';
+  return 'mixed';
+}
+
+/**
+ * 判断是否已通关全部主线案件
+ * @returns {boolean}
+ */
+export function isAllMainCasesCompleted() {
+  return _state.casesResults.slice(0, TOTAL_MAIN_CASES).every(r => r !== null);
 }
 
 // ====================
 // 存档 / 读档
 // ====================
+
+/**
+ * 重置状态到默认（完全重置，新游戏）
+ */
+export function resetState() {
+  _state = JSON.parse(JSON.stringify(defaultState));
+  _notify({});
+}
 
 /**
  * 存档到 LocalStorage
@@ -307,10 +502,10 @@ export function saveGame() {
   try {
     const data = {
       state: _deepClone(_state),
-      savedAt: new Date().toISOString()
+      savedAt: new Date().toISOString(),
+      version: 2
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    console.log('[gameState] 游戏已存档');
     return true;
   } catch (e) {
     console.error('[gameState] 存档失败:', e);
@@ -329,9 +524,18 @@ export function loadGame() {
 
     const data = JSON.parse(raw);
     if (data && data.state) {
-      _state = data.state;
+      // 兼容旧版存档：补充缺失的跨案件层字段
+      const merged = {
+        ...JSON.parse(JSON.stringify(defaultState)),
+        ...data.state
+      };
+      // 确保跨案件层字段存在
+      if (!merged.gamePhase) merged.gamePhase = 'menu';
+      if (!Array.isArray(merged.casesResults)) merged.casesResults = [];
+      if (!merged.globalFlags) merged.globalFlags = {};
+      _state = merged;
       _notify({});
-      console.log('[gameState] 读档成功，存档时间:', data.savedAt);
+      console.log('[gameState] 读档成功，gamePhase:', _state.gamePhase, '存档时间:', data.savedAt);
       return data;
     }
     return null;

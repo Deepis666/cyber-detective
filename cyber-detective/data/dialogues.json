@@ -1,74 +1,56 @@
 {
   "dialogues": {
     "intro": [
-      { "speaker": "system", "text": "2087年，新香港下城区。霓虹灯映照着潮湿的巷道，义体改造已深入社会每个角落...", "type": "narration" },
-      { "speaker": "system", "text": "一通报警电话划破了夜色——霓虹公寓404室，一名黑市义体医生被发现死在自己的手术椅上。", "type": "narration" },
-      { "speaker": "detective", "text": "又是下城区的案子。这种地方，死人不算新闻，但这次...不太一样。", "type": "thought" },
-      { "speaker": "detective", "text": "现场没有强行闯入的痕迹，门锁电子记录显示只有两个人在案发时段进出。两个嫌疑人，一间密室，一个死去的医生。", "type": "thought" },
-      { "speaker": "detective", "text": "走吧，赛博义眼，该干活了。", "type": "normal" }
+      { "speaker": "system", "text": "2087年，新香港下城区。霓虹灯暴雨，无声的暴力，一具义体医生的尸体在404室被发现。你，是负责此案的侦探。", "type": "narration" },
+      { "speaker": "detective", "text": "又是义体医生……这已经是本月第三起了。希望这次不是一桩无头案。", "type": "thought" }
     ],
     "scene_investigate": {
       "scene_body": [
-        { "id": "dia_body_001", "speaker": "system", "text": "你走进了案发现场。空气中弥漫着焦糊味和消毒水的混合气息。手术灯的强光将一切照得惨白。", "type": "narration" },
-        { "id": "dia_body_002", "speaker": "detective", "text": "死者就躺在那里，和报案描述一模一样。让我仔细看看...", "type": "thought" }
+        { "id": "dia_001", "speaker": "detective", "text": "死者后脑的神经接口被暴力拔出，手法极其专业。这不是普通劫匪干的。", "unlocksEvidence": ["evidence_005"] },
+        { "id": "dia_002", "speaker": "detective", "text": "口袋里有一封被加密删除的通讯记录——让我试着恢复它。", "unlocksEvidence": ["evidence_003"] }
       ],
       "scene_desk": [
-        { "id": "dia_desk_001", "speaker": "system", "text": "你来到了陈老九的工作台。各种义体零件和工具散落各处，一台老旧的终端机还在闪烁。", "type": "narration" },
-        { "id": "dia_desk_002", "speaker": "detective", "text": "医生的工作区，总是藏着最多的秘密。让我翻翻看。", "type": "thought" }
+        { "id": "dia_003", "speaker": "detective", "text": "一本手写账本，老派。在这个数据化时代还用纸笔，要么是怀旧，要么是不信任任何系统。", "unlocksEvidence": ["evidence_001"] }
+      ],
+      "scene_corridor": [
+        { "id": "dia_004", "speaker": "detective", "text": "公寓走廊的监控存储被人破坏过，但数据碎片中仍残留了一段关键影像。", "unlocksEvidence": ["evidence_002"] }
+      ],
+      "scene_workshop": [
+        { "id": "dia_005", "speaker": "detective", "text": "工坊角落有一枚被故意砸碎的数据芯片。销毁它的人很着急，留下了痕迹。", "unlocksEvidence": ["evidence_004"] }
       ]
     },
     "interrogation_opening": {
       "suspect_001": [
-        { "speaker": "system", "text": "林小北被带进了审讯室。他低着头，双手交叉放在膝盖上，看起来紧张但不慌乱。", "type": "narration" },
-        { "speaker": "suspect_001", "text": "我...我不知道老师怎么会出事。那天晚上我在后面仓库修理义肢，什么都没听到。", "type": "normal" }
+        { "speaker": "suspect_001", "text": "我……我不知道老师怎么会……他只是个老实人，到底谁会对他下手？", "emotion": "sad" }
       ],
       "suspect_002": [
-        { "speaker": "system", "text": "赵明月优雅地坐进审讯椅，义眼微微闪烁，扫视着房间。她的姿态从容，像是在参加一场商业谈判。", "type": "narration" },
-        { "speaker": "suspect_002", "text": "侦探先生，我理解你的工作，但请尊重我的时间。我和陈医生只是普通的客户关系。", "type": "normal" }
+        { "speaker": "suspect_002", "text": "他欠我钱，但人死了我要找谁要去？你们警察不去抓凶手，先来烦我？", "emotion": "angry" }
+      ],
+      "suspect_003": [
+        { "speaker": "suspect_003", "text": "生意上的伙伴走了，我也很难过。不过……侦探先生，你真的了解他的另一面吗？", "emotion": "calm" }
       ]
     },
     "interrogation_questions": {
       "suspect_001": [
-        {
-          "id": "q_s1_01",
-          "text": "案发当晚你在哪里？",
-          "category": "alibi"
-        },
-        {
-          "id": "q_s1_02",
-          "text": "你和陈老九的关系如何？",
-          "category": "relationship"
-        },
-        {
-          "id": "q_s1_03",
-          "text": "你知道LXB-003这个编号吗？",
-          "category": "evidence",
-          "requiresEvidence": "evidence_003"
-        },
-        {
-          "id": "q_s1_04",
-          "text": "工具架上为什么少了一把焊接器？",
-          "category": "evidence",
-          "requiresEvidence": "evidence_006"
-        }
+        { "id": "q1", "text": "案发当晚你在哪里？", "category": "alibi" },
+        { "id": "q2", "text": "你和陈老九是什么关系？", "category": "relationship" },
+        { "id": "q3", "text": "你知道陈老九最近和谁有过节吗？", "category": "motive" },
+        { "id": "q4", "text": "电磁脉冲注射器你见过吗？", "category": "weapon", "requiresEvidence": "evidence_005" },
+        { "id": "q5", "text": "这封加密通讯里的「北星」是你吗？", "category": "identity", "requiresEvidence": "evidence_003" }
       ],
       "suspect_002": [
-        {
-          "id": "q_s2_01",
-          "text": "你和陈老九到底是什么关系？",
-          "category": "relationship"
-        },
-        {
-          "id": "q_s2_02",
-          "text": "你听说过'涅槃'项目吗？",
-          "category": "evidence",
-          "requiresEvidence": "evidence_004"
-        },
-        {
-          "id": "q_s2_03",
-          "text": "案发当晚你在做什么？",
-          "category": "alibi"
-        }
+        { "id": "q1", "text": "案发当晚你的行踪？", "category": "alibi" },
+        { "id": "q2", "text": "你和陈老九有什么业务往来？", "category": "relationship" },
+        { "id": "q3", "text": "听说过「涅槃」项目吗？", "category": "secret", "requiresEvidence": "evidence_004" },
+        { "id": "q4", "text": "你的义眼有什么特殊功能？", "category": "identity" },
+        { "id": "q5", "text": "陈老九的账本里为什么有大量你的交易记录？", "category": "motive", "requiresEvidence": "evidence_001" }
+      ],
+      "suspect_003": [
+        { "id": "q1", "text": "案发当晚你在哪里？", "category": "alibi" },
+        { "id": "q2", "text": "你跟陈老九合作多久了？主要供应什么？", "category": "relationship" },
+        { "id": "q3", "text": "你给他供过军用级零件吗？", "category": "secret", "requiresEvidence": "evidence_005" },
+        { "id": "q4", "text": "陈老九最近有没有找你买过特殊的东西？", "category": "motive" },
+        { "id": "q5", "text": "你认识新人类集团的人吗？", "category": "identity", "requiresEvidence": "evidence_003" }
       ]
     }
   }
