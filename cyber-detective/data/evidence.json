@@ -49,6 +49,76 @@
       "obtainedFrom": "scene_body",
       "canCombineWith": ["evidence_003", "evidence_004"],
       "relatedTo": ["suspect_001"]
+    },
+    {
+      "id": "evidence_201",
+      "name": "物理接口柜残留",
+      "icon": "assets/ui/evidence_chip.png",
+      "description": "机房角落的物理接口柜被擦拭过，但接口端子残留的微弱电流特征与定制神经病毒'蓝屏'的激活签名完全匹配。柜体表面提取到方明辉的皮屑细胞——他声称从未进入过机房。",
+      "type": "digital",
+      "obtainedFrom": "scene_201",
+      "canCombineWith": ["evidence_202", "evidence_203"],
+      "relatedTo": ["suspect_201"]
+    },
+    {
+      "id": "evidence_202",
+      "name": "数据保险箱",
+      "icon": "assets/ui/evidence_ledger.png",
+      "description": "方明辉办公室隐蔽房间内发现的数据保险箱，生物锁仅对方明辉的神经信号开放。箱内存储着钱致远备份的'创世纪'计划核心证据——锐义科技利用下城区义体使用者进行意识复刻的完整数据链。",
+      "type": "digital",
+      "obtainedFrom": "scene_202",
+      "canCombineWith": ["evidence_201", "evidence_203"],
+      "relatedTo": ["suspect_201", "suspect_203"]
+    },
+    {
+      "id": "evidence_203",
+      "name": "蜂巢·最终备份",
+      "icon": "assets/ui/evidence_letter.png",
+      "description": "监控室操作台上被'遗忘'的U盘，刻着'蜂巢·最终备份'。内容是钱致远私人AI助手'蜂巢'的核心数据——包括钱致远最后72小时的所有通讯记录，以及一条发给唐芸的加密指令：如果他在48小时内没有重新开放蜂巢权限，就将核心数据迁移到物理保险箱。",
+      "type": "digital",
+      "obtainedFrom": "scene_203",
+      "canCombineWith": ["evidence_201", "evidence_202"],
+      "relatedTo": ["suspect_202", "suspect_203"]
+    },
+    {
+      "id": "evidence_301",
+      "name": "锐义科技编号义体零件",
+      "icon": "assets/ui/evidence_injector.png",
+      "description": "诊所冰柜中整齐排列的义体零件，每个贴着打印条码——格式与锐义科技的产品编号完全一致。这不是马三手写标签的风格，而是工厂流水线的标准包装。零件表面的焊接工艺与锐义科技的芯片工厂参数匹配。",
+      "type": "physical",
+      "obtainedFrom": "scene_301",
+      "canCombineWith": ["evidence_302", "evidence_303"],
+      "relatedTo": ["suspect_301", "suspect_303"]
+    },
+    {
+      "id": "evidence_302",
+      "name": "信号中继器",
+      "icon": "assets/ui/evidence_chip.png",
+      "description": "密室操作台上的改装信号中继器，外壳蚀刻着锐义科技logo。中继器正在实时接收和转发六组人体神经信号波形——分别对应六个接受了'特价升级'的义体改造者。信号转发的目标地址指向锐义科技总部的加密服务器。",
+      "type": "digital",
+      "obtainedFrom": "scene_302",
+      "canCombineWith": ["evidence_301", "evidence_303"],
+      "relatedTo": ["suspect_301"]
+    },
+    {
+      "id": "evidence_303",
+      "name": "隐藏控制模块",
+      "icon": "assets/ui/evidence_chip.png",
+      "description": "用检测仪扫描B4层仓库中的义体零件后发现的米粒大小黑色模块——不在任何产品规格表上。模块可以远程激活，控制植入者的神经接口，导致脑干功能衰竭。马三的死因与该模块的过载模式完全一致。",
+      "type": "physical",
+      "obtainedFrom": "scene_303",
+      "canCombineWith": ["evidence_301", "evidence_302"],
+      "relatedTo": ["suspect_301", "suspect_303"]
+    },
+    {
+      "id": "evidence_401",
+      "name": "创世纪完整架构图",
+      "icon": "assets/ui/evidence_ledger.png",
+      "description": "CEO私人空间中悬浮的三维全息模型——'创世纪'的完整架构图。每一个节点代表一个被采集意识信号的义体使用者，每一条连线代表一次犯罪行为。模型中包含韩世昌私人通讯记录的完整备份，包括三起命案的直接授权签名。这是整座冰山的全貌。",
+      "type": "digital",
+      "obtainedFrom": "scene_401",
+      "canCombineWith": [],
+      "relatedTo": ["suspect_401"]
     }
   ]
 }
