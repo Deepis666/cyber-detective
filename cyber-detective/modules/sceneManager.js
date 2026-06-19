@@ -578,8 +578,18 @@ function _calculateEnding(state) {
   const score = state.score || 0;
   const endings = _caseData?.endings || {};
 
-  if (score >= 80) return 'ending_good';
-  if (score >= 40) return 'ending_normal';
+  // 从 endings 的 condition 字段解析阈值（如 "score >= 80"）
+  const getThreshold = (endingId) => {
+    const cond = endings[endingId]?.condition || '';
+    const match = cond.match(/score\s*>=\s*(\d+)/);
+    return match ? parseInt(match[1]) : null;
+  };
+
+  const goodThreshold = getThreshold('ending_good') ?? 80;
+  const normalThreshold = getThreshold('ending_normal') ?? 40;
+
+  if (score >= goodThreshold) return 'ending_good';
+  if (score >= normalThreshold) return 'ending_normal';
   return 'ending_bad';
 }
 
@@ -587,9 +597,13 @@ function _calculateEnding(state) {
 function _checkEndingCondition(state) {
   const score = state.score || 0;
   const stress = state.stressLevel[state.currentSuspect] || 0;
+  const endings = _caseData?.endings || {};
+  const cond = endings.ending_good?.condition || '';
+  const match = cond.match(/score\s*>=\s*(\d+)/);
+  const goodThreshold = match ? parseInt(match[1]) : 80;
 
   // 如果推理评分足够高且当前嫌疑人崩溃，自动触发好结局
-  if (score >= 80 && stress >= 67) {
+  if (score >= goodThreshold && stress >= 67) {
     const endingId = _calculateEnding(state);
     setTimeout(() => _triggerEnding(endingId, score), 500);
   }

@@ -28,6 +28,27 @@
       ],
       "suspect_003": [
         { "speaker": "suspect_003", "text": "生意上的伙伴走了，我也很难过。不过……侦探先生，你真的了解他的另一面吗？", "emotion": "calm" }
+      ],
+      "suspect_201": [
+        { "speaker": "suspect_201", "text": "侦探先生，如果你有问题请直接提问，我不喜欢浪费时间在无意义的寒暄上。钱总的意外是公司的损失，但公司的运作不会因为任何人的离去而停滞。", "emotion": "calm" }
+      ],
+      "suspect_202": [
+        { "speaker": "suspect_202", "text": "锐义科技的安保系统是全城最好的。如果有人能在我们的地盘上杀人，那说明我们需要升级系统——而不是审问我。", "emotion": "cold" }
+      ],
+      "suspect_203": [
+        { "speaker": "suspect_203", "text": "蜂巢……在钱总关闭外部访问后就进入休眠了。我没有什么可以告诉你的，除了操作日志。如果你要看日志，我可以导出。", "emotion": "quiet" }
+      ],
+      "suspect_301": [
+        { "speaker": "suspect_301", "text": "哟，侦探大人亲自上门了？我这种做小生意的，哪值得您费这个劲。不过您要是想打听马三那破诊所的事，我倒可以跟您聊聊——反正那人欠我不少货款。", "emotion": "mocking" }
+      ],
+      "suspect_302": [
+        { "speaker": "suspect_302", "text": "我……我、我只是马师傅的学徒，什么都不知道……那天晚上太可怕了，我不想回忆……求你别问我太多……", "emotion": "fearful" }
+      ],
+      "suspect_303": [
+        { "speaker": "suspect_303", "text": "侦探先生，欢迎来到我的办公室。请坐，咖啡还是茶？关于马三的事，我很遗憾——但我只是一个中间人，管不了客户在自己的诊所里发生什么。", "emotion": "composed" }
+      ],
+      "suspect_401": [
+        { "speaker": "suspect_401", "text": "你终于来了，侦探。我等这一天已经等了很久。请坐——我们之间不需要审讯室的那些程序。你想知道的，我都可以告诉你，但你得先想清楚：你准备好听到答案了吗？", "emotion": "serene" }
       ]
     },
     "interrogation_questions": {
@@ -51,6 +72,55 @@
         { "id": "q3", "text": "你给他供过军用级零件吗？", "category": "secret", "requiresEvidence": "evidence_005" },
         { "id": "q4", "text": "陈老九最近有没有找你买过特殊的东西？", "category": "motive" },
         { "id": "q5", "text": "你认识新人类集团的人吗？", "category": "identity", "requiresEvidence": "evidence_003" }
+      ],
+      "suspect_201": [
+        { "id": "q1", "text": "案发当晚你在46层做什么？有没有离开过？", "category": "alibi" },
+        { "id": "q2", "text": "你和钱致远在工作中是什么关系？", "category": "relationship" },
+        { "id": "q3", "text": "你知道钱致远死前为什么关闭了蜂巢的外部权限吗？", "category": "secret", "requiresEvidence": "evidence_203" },
+        { "id": "q4", "text": "你办公室后面的隐蔽房间是怎么进入的？", "category": "identity", "requiresEvidence": "evidence_202" },
+        { "id": "q5", "text": "47层与46层之间的维护通道在正式蓝图上为什么找不到？", "category": "motive", "requiresEvidence": "evidence_201" }
+      ],
+      "suspect_202": [
+        { "id": "q1", "text": "案发时段4分钟安保盲区是怎么产生的？", "category": "alibi", "requiresEvidence": "evidence_201" },
+        { "id": "q2", "text": "你的安保团队对钱致远提供了什么样的保护？", "category": "relationship" },
+        { "id": "q3", "text": "监控室操作台上那枚蜂巢U盘是谁留下的？", "category": "secret", "requiresEvidence": "evidence_203" },
+        { "id": "q4", "text": "你对锐义科技的忠诚底线是什么？", "category": "identity" },
+        { "id": "q5", "text": "方明辉是否要求你手动关闭47层安保系统？", "category": "motive", "requiresEvidence": "evidence_201" }
+      ],
+      "suspect_203": [
+        { "id": "q1", "text": "钱致远关闭蜂巢后，你做了什么？", "category": "alibi" },
+        { "id": "q2", "text": "你和钱致远之间只是工作关系吗？", "category": "relationship", "requiresEvidence": "evidence_203" },
+        { "id": "q3", "text": "蜂巢系统里存储了什么特殊数据？", "category": "secret", "requiresEvidence": "evidence_202" },
+        { "id": "q4", "text": "钱致远给你的加密指令内容是什么？", "category": "identity", "requiresEvidence": "evidence_202" },
+        { "id": "q5", "text": "蜂巢最后一次通讯的对象是谁？", "category": "motive", "requiresEvidence": "evidence_203" }
+      ],
+      "suspect_301": [
+        { "id": "q1", "text": "你跟马三的诊所有什么业务往来？", "category": "relationship", "requiresEvidence": "evidence_301" },
+        { "id": "q2", "text": "那些义体零件中的控制模块是谁设计的？", "category": "secret", "requiresEvidence": "evidence_302" },
+        { "id": "q3", "text": "马三的死为什么和他的义体过载时间差20分钟？", "category": "motive", "requiresEvidence": "evidence_303" },
+        { "id": "q4", "text": "你作为供应链管理者，对零件的「额外功能」知情多少？", "category": "identity", "requiresEvidence": "evidence_301" },
+        { "id": "q5", "text": "信号中继器的激活频率和马三的义体过载频率为什么完全匹配？", "category": "weapon", "requiresEvidence": "evidence_303" }
+      ],
+      "suspect_302": [
+        { "id": "q1", "text": "暴走事件那天你在诊所做了什么？", "category": "alibi" },
+        { "id": "q2", "text": "马三最近有没有让你藏什么东西？", "category": "relationship" },
+        { "id": "q3", "text": "诊所仓库里那些带锐义科技编码的货箱是怎么回事？", "category": "secret", "requiresEvidence": "evidence_301" },
+        { "id": "q4", "text": "马三在暴走前收到的加密通讯内容你知道吗？", "category": "identity", "requiresEvidence": "evidence_303" },
+        { "id": "q5", "text": "你说那天在宿舍睡觉，但有人看到你出现在B4层仓库？", "category": "motive" }
+      ],
+      "suspect_303": [
+        { "id": "q1", "text": "你为马三诊所采购的都是什么类型的零件？", "category": "relationship", "requiresEvidence": "evidence_301" },
+        { "id": "q2", "text": "你经手的「常规耗材」实际月均交易量有多大？", "category": "motive" },
+        { "id": "q3", "text": "你的通讯记录里为什么出现了「模块兼容性测试」和「激活频率校准」？", "category": "secret", "requiresEvidence": "evidence_302" },
+        { "id": "q4", "text": "你是周铁手和马三之间的中间人，对吧？", "category": "identity", "requiresEvidence": "evidence_301" },
+        { "id": "q5", "text": "你说的「利润足以闭嘴」——利润来自哪里？", "category": "weapon", "requiresEvidence": "evidence_302" }
+      ],
+      "suspect_401": [
+        { "id": "q1", "text": "「创世纪」计划的真实目的是什么？", "category": "secret", "requiresEvidence": "evidence_401" },
+        { "id": "q2", "text": "三起命案中你扮演了什么角色？", "category": "motive", "requiresEvidence": "evidence_401" },
+        { "id": "q3", "text": "「自愿者」签署的知情同意书在哪里？", "category": "identity", "requiresEvidence": "evidence_401" },
+        { "id": "q4", "text": "你授权的「清除威胁源」指令涉及哪些人？", "category": "weapon", "requiresEvidence": "evidence_401" },
+        { "id": "q5", "text": "在你的世界观里，下城区的居民是什么？", "category": "relationship" }
       ]
     }
   }
