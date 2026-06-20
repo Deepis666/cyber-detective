@@ -9,10 +9,12 @@ $:
             daemon: true
             launch: |
               cd /workspace/cyber-detective
-              rm -rf dist
+              rm -rf dist node_modules/.vite
               npm ci
               npm run build
               cp -r assets/audio dist/audio
+              echo "=== dist/audio 目录内容 ==="
               ls -la dist/audio
-              npx serve dist -l 8686 -s --no-clipboard
+              echo "=== 启动静态服务器（不使用SPA模式，避免404返回HTML）==="
+              npx serve dist -l 8686 --no-clipboard
             keepAliveTimeout: 30m

@@ -119,7 +119,13 @@ export function playBGM(trackId, options = {}) {
 
   // 渐入播放
   audio.play().catch(e => {
-    console.warn('[audioManager] BGM 播放失败（可能需要用户交互）:', e.message);
+    console.warn('[audioManager] BGM 播放失败:', e.message);
+    // 诊断：检查音频文件是否存在
+    fetch(audio.src, { method: 'HEAD' }).then(r => {
+      console.warn(`[audioManager] 诊断 ${trackId}: ${audio.src} → HTTP ${r.status}, Content-Type: ${r.headers.get('content-type')}`);
+    }).catch(err => {
+      console.warn(`[audioManager] 诊断 ${trackId}: ${audio.src} → 请求失败:`, err.message);
+    });
   });
   _fadeIn(audio, volume, AUDIO_CONFIG.fadeInDuration);
 }
@@ -203,8 +209,8 @@ export function unlockAudio() {
   if (_audioUnlocked) return;
 
   // 播放一个极短静音音频来解锁浏览器的自动播放策略
-  const unlockAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAA==');
-  unlockAudio.play().catch(() => {});
+  const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAA==');
+  silentAudio.play().catch(() => {});
 
   // 重新创建所有 BGM 和音效对象，确保它们是在用户交互后创建的
   Object.entries(AUDIO_MAP.bgm).forEach(([key, path]) => {
