@@ -30,27 +30,27 @@ const AUDIO_CONFIG = {
 // ====================
 const AUDIO_MAP = {
   bgm: {
-    investigation: 'assets/audio/bgm_investigation.wav',
-    investigation_case2: 'assets/audio/bgm_investigate.mp3',
-    investigation_case3: 'assets/audio/bgm_investigate.mp3',
-    interrogation: 'assets/audio/bgm_interrogation.wav',
-    interrogation_case2: 'assets/audio/bgm_interrogation.mp3',
-    interrogation_case3: 'assets/audio/bgm_interrogation.mp3',
-    menu: 'assets/audio/bgm_menu.wav',
-    ending: 'assets/audio/bgm_ending.wav',
-    hub: 'assets/audio/bgm_hub.mp3'
+    investigation: '/audio/bgm_investigation.wav',
+    investigation_case2: '/audio/bgm_investigate.mp3',
+    investigation_case3: '/audio/bgm_investigate.mp3',
+    interrogation: '/audio/bgm_interrogation.wav',
+    interrogation_case2: '/audio/bgm_interrogation.mp3',
+    interrogation_case3: '/audio/bgm_interrogation.mp3',
+    menu: '/audio/bgm_menu.wav',
+    ending: '/audio/bgm_ending.wav',
+    hub: '/audio/bgm_hub.mp3'
   },
   sfx: {
-    evidence_obtain: 'assets/audio/sfx_evidence.wav',
-    evidence_combine: 'assets/audio/sfx_combine.wav',
-    click: 'assets/audio/sfx_click.wav',
-    contradiction: 'assets/audio/sfx_contradiction.wav',
-    stress_up: 'assets/audio/sfx_stress.wav',
-    case_switch: 'assets/audio/sfx_case_switch.wav'
+    evidence_obtain: '/audio/sfx_evidence.wav',
+    evidence_combine: '/audio/sfx_combine.wav',
+    click: '/audio/sfx_click.wav',
+    contradiction: '/audio/sfx_contradiction.wav',
+    stress_up: '/audio/sfx_stress.wav',
+    case_switch: '/audio/sfx_case_switch.wav'
   },
   voice: {
-    suspect_001_opening: 'assets/audio/voice_lin_opening.wav',
-    suspect_002_opening: 'assets/audio/voice_zhao_opening.wav'
+    suspect_001_opening: '/audio/voice_lin_opening.wav',
+    suspect_002_opening: '/audio/voice_zhao_opening.wav'
   }
 };
 
