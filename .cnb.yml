@@ -1,15 +1,16 @@
 $:
   vscode:
     - docker:
-        # 使用 CNB 预构建镜像，跳过 Docker build，秒级启动环境
+        # 预构建镜像，秒级 Prepare，跳过 Docker build
         image: cnbcool/default-dev-env:latest
+        # 自定义 Dockerfile 作为回退（更轻量）
+        build: .ide/Dockerfile
       services:
         - name: vscode
           options:
-            # 仅预览模式：评委点击后直接进入游戏，不打开 IDE
             onlyPreview: true
-            # 一条命令完成：安装依赖 → 构建项目 → 启动游戏服务
-            launch: cd /workspace/cyber-detective && npm install && npm run build && npx serve dist -l 8686 -s --no-clipboard
-            # 离线保活 30 分钟
+            # 安装依赖 → 构建项目 → 启动游戏服务（daemon模式后台运行）
+            launch:
+              - command: cd /workspace/cyber-detective && npm ci && npm run build && npx serve dist -l 8686 -s --no-clipboard
+                daemon: true
             keepAliveTimeout: 30m
-            daemon: false
