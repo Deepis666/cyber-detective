@@ -9,7 +9,9 @@ $:
             daemon: true
             launch: |
               cd /workspace/cyber-detective
+              rm -rf dist
               npm ci
               npm run build
+              ls -la dist/audio
               npx serve dist -l 8686 -s --no-clipboard
             keepAliveTimeout: 30m
