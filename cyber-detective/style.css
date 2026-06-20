@@ -996,6 +996,7 @@ html, body {
   font-size: 0.8rem;
   animation: indicator-blink 1s infinite;
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
 }
 
