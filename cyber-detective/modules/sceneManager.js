@@ -23,6 +23,18 @@ let _plotData = null;          // 主线剧情数据
 let _caseLoader = null;        // 案件数据加载器（由 main.js 注入）
 const _casesCache = {};        // 案件数据缓存 { caseId: caseData }
 
+/**
+ * 资源路径修正：自动将 assets/ 前缀转换为构建后的正确路径
+ * Vite publicDir: 'assets' 构建后会去掉 assets/ 前缀
+ */
+function _fixAssetPath(path) {
+  if (!path) return path;
+  if (typeof path === 'string' && path.startsWith('assets/')) {
+    return '/' + path.replace('assets/', '');
+  }
+  return path;
+}
+
 // 案件文件名映射
 const CASE_FILES = ['case_001', 'case_002', 'case_003', 'case_004'];
 const CASE_TITLES = ['霓虹公寓谋杀案', '数据深渊', '义体战争', '最后的真相'];
@@ -180,7 +192,7 @@ export async function switchScene(sceneId) {
  */
 function _renderSceneBackground(scene) {
   if (scene.bgImage) {
-    _elements.sceneImage.style.backgroundImage = `url(${scene.bgImage})`;
+    _elements.sceneImage.style.backgroundImage = `url(${_fixAssetPath(scene.bgImage)})`;
   } else {
     // 默认赛博朋克渐变背景
     _elements.sceneImage.style.backgroundImage = 'none';
@@ -312,9 +324,9 @@ export async function renderInterrogationScene(suspect) {
   const interrogationBGM = caseIdx >= 1 ? `interrogation_case${caseIdx + 1}` : 'interrogation';
   playBGM(interrogationBGM);
 
-  // 设置角色立绘
+  // 设置角色立绘（兼容 assets/ 前缀）
   if (suspect.portrait) {
-    _elements.characterPortrait.src = suspect.portrait;
+    _elements.characterPortrait.src = _fixAssetPath(suspect.portrait);
     _elements.characterPortrait.style.display = 'block';
   } else {
     _elements.characterPortrait.style.display = 'none';
@@ -1818,8 +1830,9 @@ function _renderEvidenceList() {
     item.className = 'evidence-item';
     item.dataset.evidenceId = evidenceId;
     // icon 字段是图片路径，用 <img> 渲染
-    const iconHtml = evData?.icon
-      ? `<img class="evidence-item-icon" src="${evData.icon}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
+    const iconSrc = _fixAssetPath(evData?.icon);
+    const iconHtml = iconSrc
+      ? `<img class="evidence-item-icon" src="${iconSrc}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
       : `<span class="evidence-item-icon">📋</span>`;
     item.innerHTML = `
       ${iconHtml}
@@ -1879,8 +1892,9 @@ async function _handlePresentEvidence() {
     const item = document.createElement('div');
     item.className = 'evidence-item selectable';
     item.dataset.evidenceId = evId;
-    const iconHtml = evData?.icon
-      ? `<img class="evidence-item-icon" src="${evData.icon}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
+    const presentIconSrc = _fixAssetPath(evData?.icon);
+    const iconHtml = presentIconSrc
+      ? `<img class="evidence-item-icon" src="${presentIconSrc}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
       : `<span class="evidence-item-icon">📋</span>`;
     item.innerHTML = `
       ${iconHtml}
@@ -1975,8 +1989,9 @@ async function _handleCombineEvidence() {
     const item = document.createElement('div');
     item.className = 'evidence-item';
     item.dataset.evidenceId = evId;
-    const iconHtml = evData?.icon
-      ? `<img class="evidence-item-icon" src="${evData.icon}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
+    const combineIconSrc = _fixAssetPath(evData?.icon);
+    const iconHtml = combineIconSrc
+      ? `<img class="evidence-item-icon" src="${combineIconSrc}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
       : `<span class="evidence-item-icon">📋</span>`;
     item.innerHTML = `
       ${iconHtml}
