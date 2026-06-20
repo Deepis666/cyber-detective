@@ -24,7 +24,7 @@
       "id": "scene_201",
       "name": "数据中心·核心机房",
       "description": "47层的核心机房被冷蓝色LED灯笼罩，空气中弥漫着服务器散热的干燥气息。钱致远的尸体瘫坐在主控台前，面部泛着病态的蓝光，像一尊被冰封的雕像。他面前的全息屏还在闪烁——最后一条指令被截断在执行途中。地板上有一行被匆忙擦拭过的鞋印，从主控台延伸到机房角落的物理接口柜。",
-      "bgImage": "assets/bg/scene_201.png",
+      "bgImage": "/bg/scene_201.png",
       "hotspots": [
         { "id": "examine_201", "label": "检查物理接口柜", "type": "evidence", "evidenceId": "evidence_201", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_201", "label": "前往CTO办公室", "type": "move", "targetScene": "scene_202", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -34,7 +34,7 @@
       "id": "scene_202",
       "name": "CTO办公室·方明辉",
       "description": "方明辉的办公室在46层，落地窗俯瞰整个尖塔区。桌面整洁得近乎强迫症——但抽屉里有一张被反复折叠的纸条，上面手写着'蜂巢已沉默'。书架后方有一道隐蔽的生物锁，通往一间没有在公司蓝图上标注的房间。",
-      "bgImage": "assets/bg/scene_202.png",
+      "bgImage": "/bg/scene_202.png",
       "hotspots": [
         { "id": "examine_202", "label": "检查隐蔽房间", "type": "evidence", "evidenceId": "evidence_202", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_202", "label": "前往安全监控室", "type": "move", "targetScene": "scene_203", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -44,7 +44,7 @@
       "id": "scene_203",
       "name": "安全监控室",
       "description": "监控室的三十六块屏幕中有四块显示着案发时段的录像——全是雪花。安保主管说这是'系统例行维护'，但维护记录显示下次维护是在两周后。角落的操作台上有一枚被遗忘的U盘，上面刻着'蜂巢·最终备份'。",
-      "bgImage": "assets/bg/scene_203.png",
+      "bgImage": "/bg/scene_203.png",
       "hotspots": [
         { "id": "examine_203", "label": "检查蜂巢U盘", "type": "evidence", "evidenceId": "evidence_203", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_203", "label": "返回核心机房", "type": "move", "targetScene": "scene_201", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }

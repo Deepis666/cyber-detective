@@ -29,7 +29,7 @@
       "id": "scene_401",
       "name": "CEO私人空间·创世纪核心",
       "description": "锐义科技总部的顶层没有出现在任何公开的建筑蓝图上。电梯到达最高层后还需要虹膜+声纹+神经信号三重验证才能进入。里面是一间圆形的全息投影室，正中央悬浮着一个由数百条数据流编织而成的三维模型——那是'创世纪'的完整架构图。每一个节点都是一条人命，每一条连线都是一次犯罪。韩世昌站在模型前，背对着你，双手背在身后，像在欣赏一件艺术品。'你终于来了，侦探。我等这一天，已经等了很久。'",
-      "bgImage": "assets/bg/case004_scene_1.png",
+      "bgImage": "/bg/case004_scene_1.png",
       "hotspots": [
         { "id": "examine_401", "label": "提取创世纪核心数据", "type": "evidence", "evidenceId": "evidence_401", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true }
       ]

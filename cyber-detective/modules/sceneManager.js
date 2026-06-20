@@ -1117,7 +1117,7 @@ async function _renderHub() {
   // 0. 接入 Hub 事务所背景图（C组已提供 hub_office.png）
   const hubBgEl = document.querySelector('#hub-screen .hub-bg');
   if (hubBgEl) {
-    hubBgEl.style.backgroundImage = 'url(assets/bg/hub_office.png)';
+    hubBgEl.style.backgroundImage = 'url(/bg/hub_office.png)';
     hubBgEl.style.backgroundSize = 'cover';
     hubBgEl.style.backgroundPosition = 'center';
     hubBgEl.style.backgroundBlendMode = 'overlay';
@@ -1213,14 +1213,14 @@ function _renderCaseIndicator(results) {
     // 使用 C 组提供的 UI 图标（case_progress_good/bad/locked.png）
     if (result) {
       if (result.ending === 'ending_good') {
-        dot.style.backgroundImage = 'url(assets/ui/case_progress_good.png)';
+        dot.style.backgroundImage = 'url(/ui/case_progress_good.png)';
       } else if (result.ending === 'ending_bad') {
-        dot.style.backgroundImage = 'url(assets/ui/case_progress_bad.png)';
+        dot.style.backgroundImage = 'url(/ui/case_progress_bad.png)';
       } else {
         dot.textContent = '—';
       }
     } else {
-      dot.style.backgroundImage = 'url(assets/ui/case_progress_locked.png)';
+      dot.style.backgroundImage = 'url(/ui/case_progress_locked.png)';
       dot.classList.add('locked');
     }
     dot.style.backgroundSize = 'contain';
@@ -1256,9 +1256,9 @@ function _renderCaseIndicator(results) {
     const dot = document.createElement('div');
     dot.className = 'hub-case-dot';
     if (hiddenResult) {
-      dot.style.backgroundImage = 'url(assets/ui/case_progress_good.png)';
+      dot.style.backgroundImage = 'url(/ui/case_progress_good.png)';
     } else {
-      dot.style.backgroundImage = 'url(assets/ui/case_progress_locked.png)';
+      dot.style.backgroundImage = 'url(/ui/case_progress_locked.png)';
       dot.classList.add('locked');
     }
     dot.style.backgroundSize = 'contain';

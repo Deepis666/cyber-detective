@@ -24,7 +24,7 @@
       "id": "scene_301",
       "name": "黑诊所·手术区",
       "description": "废弃地铁站改造的诊所弥漫着消毒水和烧焦电路的混合气味。三张手术台上的束缚带被挣断，地面散落着还沾着血的义体零件。角落的冰柜里整齐排列着植入体样本，每个都贴着编号——但不是马三的手写标签，而是打印的条码，格式与锐义科技的产品编号完全一致。",
-      "bgImage": "assets/bg/scene_301.png",
+      "bgImage": "/bg/scene_301.png",
       "hotspots": [
         { "id": "examine_301", "label": "检查冰柜中的义体零件", "type": "evidence", "evidenceId": "evidence_301", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_301", "label": "进入密室", "type": "move", "targetScene": "scene_302", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -34,7 +34,7 @@
       "id": "scene_302",
       "name": "密室·数据站",
       "description": "暗门后面是一间不可思议的空间——六块全息屏围成半圆，每块屏幕上都是实时的人体神经信号波形图。中间的操作台上放着一台改装过的信号中继器，外壳上蚀刻着锐义科技的logo。墙上贴着一张手写的时间表：三周内的每一次手术，每一个植入体的接收者，以及一个用红笔圈出的词——'创世纪·第三阶段'。",
-      "bgImage": "assets/bg/scene_302.png",
+      "bgImage": "/bg/scene_302.png",
       "hotspots": [
         { "id": "examine_302", "label": "检查信号中继器", "type": "evidence", "evidenceId": "evidence_302", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_302", "label": "前往零件仓库", "type": "move", "targetScene": "scene_303", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -44,7 +44,7 @@
       "id": "scene_303",
       "name": "B4层·零件仓库",
       "description": "地铁站更下一层被改成了零件仓库。货架上的箱子印着锐义科技的物流编码，但收货地址写的是一家早已注销的'新港义体配件商行'。箱子里的义体零件表面看不出异常，但用检测仪扫描后，每个零件的核心芯片旁边都多出一块米粒大小的黑色模块——不在任何产品规格表上。",
-      "bgImage": "assets/bg/scene_303.png",
+      "bgImage": "/bg/scene_303.png",
       "hotspots": [
         { "id": "examine_303", "label": "扫描隐藏控制模块", "type": "evidence", "evidenceId": "evidence_303", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_303", "label": "返回手术区", "type": "move", "targetScene": "scene_301", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }

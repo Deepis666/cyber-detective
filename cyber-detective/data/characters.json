@@ -4,7 +4,7 @@
       "id": "suspect_001",
       "name": "林小北",
       "identity": "死者的助手兼学徒，22岁，跟陈老九学习义体维修3年",
-      "portrait": "assets/characters/suspect_001.png",
+      "portrait": "/characters/suspect_001.png",
       "personality": "外表温顺内向，实际心思缜密。对师傅表面尊敬，暗中有强烈的不安全感。害怕被出卖，有自我保护的强烈本能。",
       "secretKnowledge": "实际上是大型生物科技公司「新人类集团」安插在陈老九身边的卧底，代号「北星」。暗中向新人类集团输送陈老九的义体实验数据。陈老九已发现其身份并威胁举报。",
       "lies": [
@@ -33,13 +33,13 @@
           "counterEvidence": "evidence_004"
         }
       ],
-      "icon": "assets/ui/evidence_camera.png"
+      "icon": "/ui/evidence_camera.png"
     },
     {
       "id": "suspect_002",
       "name": "赵明月",
       "identity": "锐义科技高级副总裁，38岁，常驻尖塔区企业总部",
-      "portrait": "assets/characters/suspect_002.png",
+      "portrait": "/characters/suspect_002.png",
       "personality": "冷静精明的企业高管，谈吐优雅但带有居高临下的优越感。右眼为订制军用级义眼，说谎时义眼光圈会微微闪烁。极度重视自己的社会地位和公司声誉。",
       "secretKnowledge": "秘密资助陈老九进行代号「涅槃」的非法「意识覆盖」实验——试图将人类意识通过神经接口覆盖到另一个人脑中。该项目一旦曝光将毁掉锐义科技的市值。陈老九想把实验数据卖给竞争对手。",
       "lies": [
@@ -62,13 +62,13 @@
           "counterEvidence": "evidence_001"
         }
       ],
-      "icon": "assets/ui/evidence_ledger.png"
+      "icon": "/ui/evidence_ledger.png"
     },
     {
       "id": "suspect_003",
       "name": "钱一鸣",
       "identity": "地下义体零件供应商，45岁，控制下城区60%的二手义体供应链",
-      "portrait": "assets/characters/suspect_003.png",
+      "portrait": "/characters/suspect_003.png",
       "personality": "表面豪爽讲义气，实则精于算计的中间商。在下城区人脉极广，与各方势力都有往来。面对审讯时擅长用反问和转移话题来应对。",
       "secretKnowledge": "长期向陈老九供应来源不明的军用级义体零件（包括新人类集团的走私品）。案发前陈老九向他索取了一批特殊的神经接口组件——这些零件后来被发现出现在凶器上。",
       "lies": [
@@ -85,13 +85,13 @@
           "counterEvidence": "evidence_003"
         }
       ],
-      "icon": "assets/ui/evidence_injector.png"
+      "icon": "/ui/evidence_injector.png"
     },
     {
       "id": "suspect_201",
       "name": "唐芸",
       "identity": "钱致远的私人AI助手维护工程师，28岁，负责「蜂巢」系统的日常运维",
-      "portrait": "assets/characters/suspect_201.png",
+      "portrait": "/characters/suspect_201.png",
       "personality": "话少但观察力极强，典型的技术宅性格。说话喜欢用数据和逻辑，但偶尔会流露出对钱致远的私人感情——那不只是上下级关系。左耳后植入了一枚定制通讯芯片，与「蜂巢」系统直连。",
       "secretKnowledge": "钱致远死前72小时关闭了「蜂巢」的外部访问权限，但他给唐芸留了一道加密指令——如果他在48小时内没有重新开放权限，就将蜂巢的核心数据迁移到物理保险箱。唐芸执行了这道指令，但她不知道保险箱的具体位置。",
       "lies": [
@@ -108,13 +108,13 @@
           "counterEvidence": "evidence_203"
         }
       ],
-      "icon": "assets/ui/evidence_letter.png"
+      "icon": "/ui/evidence_letter.png"
     },
     {
       "id": "suspect_202",
       "name": "方明辉",
       "identity": "锐义科技CTO，50岁，技术出身的权力核心",
-      "portrait": "assets/characters/suspect_202.png",
+      "portrait": "/characters/suspect_202.png",
       "personality": "精英技术官僚，逻辑缜密，情感隔离。说话精准如代码注释，从不使用不确定的词汇。左臂为全义体化替换，思考时指尖会不自觉地做敲击动作——这是他唯一的情绪泄露。",
       "secretKnowledge": "作为CTO负责销毁「创世纪」计划的一切痕迹。钱致远发现公司利用下城区义体植入者的神经信号进行意识复刻实验后，方明辉亲自设计了「蓝屏」病毒，在4分钟安保盲区内通过机房物理接口注入，将钱致远灭口。",
       "lies": [
@@ -137,13 +137,13 @@
           "counterEvidence": "evidence_202"
         }
       ],
-      "icon": "assets/ui/evidence_chip.png"
+      "icon": "/ui/evidence_chip.png"
     },
     {
       "id": "suspect_203",
       "name": "刘小薇",
       "identity": "锐义科技安保系统主管，34岁，负责总部全部安防系统",
-      "portrait": "assets/characters/suspect_203.png",
+      "portrait": "/characters/suspect_203.png",
       "personality": "严肃刻板，军人作风。说话简洁，从不解释第二遍。双眼为军用级义眼，能实时扫描周围环境的威胁等级。对锐义科技有强烈的忠诚感，但这份忠诚正在被良心啃噬。",
       "secretKnowledge": "4分钟安保盲区不是系统故障——是方明辉以「系统压力测试」名义要求她手动关闭的。她当时不知道关闭的真正目的，但事后意识到自己成了帮凶。她在监控室「遗忘」了蜂巢U盘，作为无声的举报。",
       "lies": [
@@ -160,13 +160,13 @@
           "counterEvidence": "evidence_203"
         }
       ],
-      "icon": "assets/ui/evidence_camera.png"
+      "icon": "/ui/evidence_camera.png"
     },
     {
       "id": "suspect_301",
       "name": "孙婉清",
       "identity": "义体掮客/中间人，36岁，在下城区与尖塔区之间牵线搭桥",
-      "portrait": "assets/characters/suspect_301.png",
+      "portrait": "/characters/suspect_301.png",
       "personality": "八面玲珑，说话滴水不漏。永远面带微笑，但眼神冰冷如手术刀。下城区的人叫她「孙姐」，尖塔区的人叫她「孙总监」——她同时服务两个世界，只忠于利润。",
       "secretKnowledge": "孙婉清是周铁手和马三之间的中间人。她负责将周铁手提供的「特供零件」以合法渠道的伪装运送到马三的诊所。她知道零件里藏着「额外功能」，但她选择不问——她的佣金足以让她闭嘴。",
       "lies": [
@@ -183,13 +183,13 @@
           "counterEvidence": "evidence_302"
         }
       ],
-      "icon": "assets/ui/evidence_chip.png"
+      "icon": "/ui/evidence_chip.png"
     },
     {
       "id": "suspect_302",
       "name": "周铁手",
       "identity": "锐义科技外部顾问/义体供应链管理者，47岁，绰号「铁手」",
-      "portrait": "assets/characters/suspect_302.png",
+      "portrait": "/characters/suspect_302.png",
       "personality": "外表粗犷豪放，实则心狠手辣。双手为全义体化改造，力度可以精确到拧开一颗螺丝也可以一拳打穿钢板。说话时喜欢用比喻，但不经意间流露出对下城区居民的蔑视——在他眼里，那些人只是「零件」。",
       "secretKnowledge": "锐义科技「创世纪」计划的义体供应链核心管理者。通过马三的诊所将植入神经控制模块的义体零件分发到下城区，用于大规模意识信号采集实验。马三发现隐藏模块后试图勒索，周铁手在暴走事件制造混乱时远程激活马三自身的神经接口将其灭口。",
       "lies": [
@@ -212,13 +212,13 @@
           "counterEvidence": "evidence_303"
         }
       ],
-      "icon": "assets/ui/evidence_injector.png"
+      "icon": "/ui/evidence_injector.png"
     },
     {
       "id": "suspect_303",
       "name": "阿七（李七）",
       "identity": "马三的学徒兼助手，19岁，在诊所打杂两年",
-      "portrait": "assets/characters/suspect_303.png",
+      "portrait": "/characters/suspect_303.png",
       "personality": "胆小怕事但心地善良，说话结巴，紧张时左手会不停摸自己的义体耳朵。对马三有复杂的感情——既是师父也是唯一的依靠。知道诊所的很多秘密，但从来不敢说。",
       "secretKnowledge": "阿七在暴走事件前3天看到马三和周铁手在密室里争吵，马三说「你这些零件里有鬼，我知道，你得加钱」。周铁手离开后，马三让阿七去B4层仓库把那批「特供零件」的出货记录藏起来——如果自己出了事，就把记录交给下城区的线人。",
       "lies": [
@@ -235,13 +235,13 @@
           "counterEvidence": "evidence_303"
         }
       ],
-      "icon": "assets/ui/evidence_ledger.png"
+      "icon": "/ui/evidence_ledger.png"
     },
     {
       "id": "suspect_401",
       "name": "韩世昌",
       "identity": "锐义科技CEO/创始人，62岁，「创世纪」计划唯一决策者",
-      "portrait": "assets/characters/suspect_401.png",
+      "portrait": "/characters/suspect_401.png",
       "personality": "温文尔雅的独裁者。说话从容不迫，永远带着一种超然的平静，仿佛已经看透了所有人的结局。他不否认任何指控，只是重新定义它们——在他口中，谋杀是「进化」，剥削是「赋能」，受害者的痛苦是「为人类未来支付的代价」。",
       "secretKnowledge": "「创世纪」计划的唯一决策者和最终受益人。陈老九提供义体供应，方明辉负责数据清洗，周铁手管理人体测试——三条命案的执行者都是他授权的，但他从未亲手杀过任何人。他的罪行不是谋杀，而是设计了一台精密的杀戮机器然后假装自己只是按下了开关。",
       "lies": [
@@ -258,7 +258,7 @@
           "counterEvidence": "evidence_401"
         }
       ],
-      "icon": "assets/ui/evidence_letter.png"
+      "icon": "/ui/evidence_letter.png"
     }
   ]
 }

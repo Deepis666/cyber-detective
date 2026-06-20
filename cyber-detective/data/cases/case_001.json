@@ -23,7 +23,7 @@
       "id": "scene_body",
       "name": "案发现场·404室",
       "description": "404室房门半掩，一股烧焦的电路板气味扑面而来。陈老九的尸体倒在床和工坊操作台之间，后脑的神经接口被暴力拔出，接口周围的组织呈现不正常的焦黑色。房间窗户紧闭，从内部反锁——这是一间密室。",
-      "bgImage": "assets/bg/scene_body.png",
+      "bgImage": "/bg/scene_body.png",
       "hotspots": [
         { "id": "body_examine", "label": "检查尸体", "type": "evidence", "evidenceId": "evidence_005", "position": { "top": "40%", "left": "50%", "width": "100px", "height": "120px" }, "once": true },
         { "id": "pocket_search", "label": "搜索口袋", "type": "evidence", "evidenceId": "evidence_003", "position": { "top": "52%", "left": "42%", "width": "60px", "height": "60px" }, "once": true },
@@ -35,7 +35,7 @@
       "id": "scene_corridor",
       "name": "公寓走廊",
       "description": "霓虹公寓4楼的走廊幽暗狭窄，头顶的日光灯管时不时滋滋闪烁。地上散落着外卖盒和废旧电子元件。404室门外贴着封条，走廊尽头的监控摄像头镜头已被激光切割器破坏。",
-      "bgImage": "assets/bg/scene_corridor.png",
+      "bgImage": "/bg/scene_corridor.png",
       "hotspots": [
         { "id": "camera_examine", "label": "检查监控", "type": "evidence", "evidenceId": "evidence_002", "position": { "top": "15%", "left": "85%", "width": "60px", "height": "60px" }, "once": true },
         { "id": "move_body", "label": "返回404室", "type": "move", "targetScene": "scene_body", "position": { "top": "60%", "left": "30%", "width": "80px", "height": "90px" } },
@@ -46,7 +46,7 @@
       "id": "scene_desk",
       "name": "陈老九的书桌",
       "description": "一张布满焊痕的老旧金属书桌，上面堆满了电路板、焊枪和半拆解的义体零件。桌面的一角用老式钢笔压着一本手写账本——在这个全数据化的时代显得格外刺眼。",
-      "bgImage": "assets/bg/scene_desk.png",
+      "bgImage": "/bg/scene_desk.png",
       "hotspots": [
         { "id": "ledger_examine", "label": "翻阅账本", "type": "evidence", "evidenceId": "evidence_001", "position": { "top": "35%", "left": "55%", "width": "80px", "height": "60px" }, "once": true },
         { "id": "move_body", "label": "返回404室", "type": "move", "targetScene": "scene_body", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -56,7 +56,7 @@
       "id": "scene_workshop",
       "name": "地下义体工坊",
       "description": "公寓地下室的秘密工坊，四周墙壁贴满了神经接口的解剖图和电路设计稿。空气中弥漫着焊接烟雾和消毒酒精的气味。角落的废料箱里有什么东西被打碎了——一枚数据芯片的碎片。",
-      "bgImage": "assets/bg/scene_workshop.png",
+      "bgImage": "/bg/scene_workshop.png",
       "hotspots": [
         { "id": "chip_examine", "label": "检查碎片", "type": "evidence", "evidenceId": "evidence_004", "position": { "top": "70%", "left": "15%", "width": "70px", "height": "70px" }, "once": true },
         { "id": "move_corridor", "label": "返回走廊", "type": "move", "targetScene": "scene_corridor", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
