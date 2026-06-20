@@ -121,7 +121,6 @@ export function playBGM(trackId, options = {}) {
   audio.play().catch(e => {
     console.warn('[audioManager] BGM 播放失败（可能需要用户交互）:', e.message);
   });
-
   _fadeIn(audio, volume, AUDIO_CONFIG.fadeInDuration);
 }
 
@@ -194,6 +193,36 @@ export function playVoice(characterId, lineId) {
 // ====================
 // 全局控制
 // ====================
+
+let _audioUnlocked = false;
+
+/**
+ * 解锁音频上下文（必须在用户交互后调用）
+ */
+export function unlockAudio() {
+  if (_audioUnlocked) return;
+
+  // 播放一个极短静音音频来解锁浏览器的自动播放策略
+  const unlockAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQQAAAAAAA==');
+  unlockAudio.play().catch(() => {});
+
+  // 重新创建所有 BGM 和音效对象，确保它们是在用户交互后创建的
+  Object.entries(AUDIO_MAP.bgm).forEach(([key, path]) => {
+    const audio = new Audio(path);
+    audio.loop = true;
+    audio.volume = 0;
+    _audioCache[`bgm_${key}`] = audio;
+  });
+
+  Object.entries(AUDIO_MAP.sfx).forEach(([key, path]) => {
+    const audio = new Audio(path);
+    audio.volume = AUDIO_CONFIG.sfxVolume;
+    _audioCache[`sfx_${key}`] = audio;
+  });
+
+  _audioUnlocked = true;
+  console.log('[audioManager] 音频已解锁');
+}
 
 /**
  * 停止所有音频

@@ -10,7 +10,7 @@ import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, set
 import { showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, showDialogueOverlay, resetDialogueState, isDialogueBusy } from './dialogueSystem.js';
 import { getEvidenceData, presentEvidence as evidencePresent, combineEvidence as evidenceCombine, selectEvidence, getSelectedEvidence, clearSelectedEvidence, renderEvidenceBar } from './evidenceSystem.js';
 import { interrogateAI, investigateAI, isAPIAvailable, setAIEngineCaseContext, setAIEnabled } from './aiEngine.js';
-import { playBGM, playSFX, setMusicEnabled } from './audioManager.js';
+import { playBGM, playSFX, setMusicEnabled, unlockAudio } from './audioManager.js';
 import { initPlotManager, getPlotData, getCurrentHubDialogue, getAllNewsFeed, getNextCaseIndex, shouldEnterFinalEnding, getFinalEnding, evaluateBranch, getHubDialogue, getNewsFeed } from './plotManager.js';
 
 // ====================
@@ -1636,6 +1636,9 @@ function _bindGlobalActions() {
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
+
+    // 首次用户交互时解锁音频上下文（解决浏览器自动播放策略）
+    unlockAudio();
 
     const action = btn.dataset.action;
     console.log(`[DEBUG] _bindGlobalActions 点击: action=${action}, btn=`, btn);

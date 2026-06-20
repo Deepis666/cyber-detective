@@ -134,10 +134,9 @@ async function init() {
     if (continueBtn) continueBtn.disabled = false;
   }
 
-  // 延迟切换到主菜单
+  // 延迟切换到主菜单（不自动播放 BGM，避免浏览器拦截自动播放）
   setTimeout(() => {
     switchScreen('menu');
-    playBGM('menu');
   }, 1500);
 
   console.log('[main] 游戏初始化完成');
