@@ -1,0 +1,15 @@
+$:
+  vscode:
+    - docker:
+        build: .ide/Dockerfile
+      services:
+        - name: vscode
+          options:
+            # 仅预览模式：评委点击按钮后直接进入游戏，不进入 IDE
+            onlyPreview: true
+            # 启动命令：构建项目并在 8686 端口启动静态服务
+            launch: bash /workspace/start-preview.sh
+            # 离线保活 30 分钟，给评委足够的体验时间
+            keepAliveTimeout: 30m
+            # 守护进程模式
+            daemon: false
