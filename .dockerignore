@@ -1,0 +1,5 @@
+cyber-detective/node_modules
+cyber-detective/dist
+.git
+.ide
+.vscode

@@ -1,20 +1,28 @@
+main:
+  push:
+    - stages:
+        - name: build-and-push
+          script: |
+            docker build -t docker.cnb.cool/vbgame-2026/cyberdetective:latest .
+            docker push docker.cnb.cool/vbgame-2026/cyberdetective:latest
+      services:
+        - docker
+
 $:
   vscode:
-    - docker:
-        image: cnbcool/default-dev-env:latest
+    - runner:
+        cpus: 16
       services:
+        - docker
         - name: vscode
           options:
             onlyPreview: true
             daemon: true
             launch: |
-              cd /workspace/cyber-detective
-              rm -rf dist node_modules/.vite
-              npm ci
-              npm run build
-              cp -r assets/audio dist/audio
-              echo "=== dist/audio 目录内容 ==="
-              ls -la dist/audio
-              echo "=== 启动静态服务器（不使用SPA模式，避免404返回HTML）==="
-              npx serve dist -l 8686 --no-clipboard
-            keepAliveTimeout: 30m
+              docker run -d --network host \
+                -e PORT=8686 \
+                -e CNB_API_ENDPOINT \
+                -e CNB_REPO_SLUG \
+                -e CNB_TOKEN \
+                docker.cnb.cool/vbgame-2026/cyberdetective:latest
+            keepAliveTimeout: 3600000

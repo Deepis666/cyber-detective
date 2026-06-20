@@ -1,0 +1,5 @@
+workspace:
+  launch:
+    button:
+      name: 🕵️ 开始调查
+      description: 进入赛博朋克侦探世界，破解霓虹公寓谋杀案
