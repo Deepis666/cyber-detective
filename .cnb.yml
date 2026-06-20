@@ -1,16 +1,15 @@
 $:
   vscode:
     - docker:
-        # 预构建镜像，秒级 Prepare，跳过 Docker build
         image: cnbcool/default-dev-env:latest
-        # 自定义 Dockerfile 作为回退（更轻量）
-        build: .ide/Dockerfile
       services:
         - name: vscode
           options:
             onlyPreview: true
-            # 安装依赖 → 构建项目 → 启动游戏服务（daemon模式后台运行）
-            launch:
-              - command: cd /workspace/cyber-detective && npm ci && npm run build && npx serve dist -l 8686 -s --no-clipboard
-                daemon: true
+            daemon: true
+            launch: |
+              cd /workspace/cyber-detective
+              npm ci
+              npm run build
+              npx serve dist -l 8686 -s --no-clipboard
             keepAliveTimeout: 30m
