@@ -6,11 +6,11 @@
  * 场景数据从 data/ 目录加载。
  */
 
-import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState, addStress, addScore, getStress, getEmotion, setEnding, loadGame, resetState, setGamePhase, getGamePhase, startNewCase, recordCaseResult, checkHiddenCaseUnlock, getCurrentCaseIndex, getCasesResults, getCaseResult, initSuspectStress, isAllMainCasesCompleted, getFinalEndingType } from './gameState.js';
-import { showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, showDialogueOverlay } from './dialogueSystem.js';
+import { setPhase, setCurrentScene, setCurrentSuspect, addEvidence, getFlag, setFlag, getState, addStress, addScore, getStress, getEmotion, setEnding, loadGame, resetState, setGamePhase, getGamePhase, startNewCase, recordCaseResult, checkHiddenCaseUnlock, getCurrentCaseIndex, getCasesResults, getCaseResult, initSuspectStress, isAllMainCasesCompleted, getFinalEndingType, getSettings, updateSettings } from './gameState.js';
+import { showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, showDialogueOverlay, resetDialogueState, isDialogueBusy } from './dialogueSystem.js';
 import { getEvidenceData, presentEvidence as evidencePresent, combineEvidence as evidenceCombine, selectEvidence, getSelectedEvidence, clearSelectedEvidence, renderEvidenceBar } from './evidenceSystem.js';
-import { interrogateAI, investigateAI, isAPIAvailable, setAIEngineCaseContext } from './aiEngine.js';
-import { playBGM, playSFX } from './audioManager.js';
+import { interrogateAI, investigateAI, isAPIAvailable, setAIEngineCaseContext, setAIEnabled } from './aiEngine.js';
+import { playBGM, playSFX, setMusicEnabled } from './audioManager.js';
 import { initPlotManager, getPlotData, getCurrentHubDialogue, getAllNewsFeed, getNextCaseIndex, shouldEnterFinalEnding, getFinalEnding, evaluateBranch, getHubDialogue, getNewsFeed } from './plotManager.js';
 
 // ====================
@@ -18,6 +18,7 @@ import { initPlotManager, getPlotData, getCurrentHubDialogue, getAllNewsFeed, ge
 // ====================
 let _scenesData = null;
 let _caseData = null;          // 当前激活的案件数据
+let _evidenceData = null;      // 证据数据（用于结案扣分检查）
 let _plotData = null;          // 主线剧情数据
 let _caseLoader = null;        // 案件数据加载器（由 main.js 注入）
 const _casesCache = {};        // 案件数据缓存 { caseId: caseData }
@@ -49,10 +50,12 @@ let _elements = {};
  * @param {Object} caseData - 案件数据
  * @param {Object} plotData - 主线剧情数据（可选，多案件扩展）
  * @param {Function} caseLoader - 案件数据加载器 (caseId) => Promise<caseData>（可选）
+ * @param {Object} evidenceData - 证据数据（可选，用于结案扣分检查）
  */
-export function initSceneManager(scenesData, caseData, plotData = null, caseLoader = null) {
+export function initSceneManager(scenesData, caseData, plotData = null, caseLoader = null, evidenceData = null) {
   _scenesData = scenesData;
   _caseData = caseData;
+  _evidenceData = evidenceData;
   _plotData = plotData;
   _caseLoader = caseLoader;
 
@@ -128,7 +131,7 @@ export function switchScreen(screenName) {
  * 切换调查场景
  * @param {string} sceneId - 场景 ID
  */
-export function switchScene(sceneId) {
+export async function switchScene(sceneId) {
   if (!_scenesData || !_scenesData[sceneId]) {
     console.error(`[sceneManager] 场景数据不存在: ${sceneId}`);
     return;
@@ -138,8 +141,10 @@ export function switchScene(sceneId) {
   setPhase('investigate');
   switchScreen('investigate');
 
-  // 播放调查场景BGM
-  playBGM('investigation');
+  // 播放调查场景BGM（案件2/3使用专属BGM）
+  const caseIdx = getCurrentCaseIndex();
+  const investigationBGM = caseIdx >= 1 ? `investigation_case${caseIdx + 1}` : 'investigation';
+  playBGM(investigationBGM);
 
   const scene = _scenesData[sceneId];
 
@@ -152,13 +157,17 @@ export function switchScene(sceneId) {
   // 隐藏对话框
   hideDialogueOverlay();
 
-  // 显示场景描述
-  if (scene.description) {
-    showDialogue({
+  // 显示场景描述（仅首次进入该场景时显示，避免重复）
+  if (scene.description && !getFlag(`scene_visited_${sceneId}`)) {
+    setFlag(`scene_visited_${sceneId}`, true);
+    // 等待玩家看完场景描述并点击关闭
+    await showDialogue({
       speaker: 'narration',
       text: scene.description,
       type: 'narration'
     });
+    // 玩家点击推进后隐藏对话框，不阻挡调查交互
+    hideDialogueOverlay();
   }
 }
 
@@ -200,7 +209,19 @@ function _renderHotspots(hotspots) {
   _elements.sceneHotspots.innerHTML = '';
   _currentHotspots = [];
 
+  // 同时渲染调查线索列表（不依赖背景图位置）
+  const cluesEl = document.getElementById('investigation-clues');
+  if (cluesEl) cluesEl.innerHTML = '';
+
   const state = getState();
+
+  // 按类型定义图标和样式
+  const HOTSPOT_ICONS = {
+    evidence: '🔍',
+    move: '🚪',
+    talk: '💬',
+    examine: '🔎'
+  };
 
   hotspots.forEach(hotspot => {
     // 检查是否已被获取（证据类热点）
@@ -213,52 +234,83 @@ function _renderHotspots(hotspots) {
       return;
     }
 
+    // 1. 渲染绝对定位热点（保留，但仅作为背景图上的视觉标记）
     const el = document.createElement('div');
-    el.className = 'hotspot';
+    el.className = `hotspot hotspot-${hotspot.type}`;
     el.dataset.id = hotspot.id;
     el.dataset.type = hotspot.type;
 
-    // 定位
     if (hotspot.position) {
       el.style.top = hotspot.position.top;
       el.style.left = hotspot.position.left;
       el.style.width = hotspot.position.width;
       el.style.height = hotspot.position.height;
     } else {
-      // 默认位置
       el.style.top = '30%';
       el.style.left = '30%';
       el.style.width = '80px';
       el.style.height = '80px';
     }
 
-    // 标签
+    const icon = HOTSPOT_ICONS[hotspot.type] || '🔍';
+    el.innerHTML = `<span class="hotspot-icon">${icon}</span>`;
     if (hotspot.label) {
       el.title = hotspot.label;
       el.setAttribute('aria-label', hotspot.label);
+      const labelEl = document.createElement('span');
+      labelEl.className = 'hotspot-label';
+      labelEl.textContent = hotspot.label;
+      el.appendChild(labelEl);
     }
 
-    // 点击事件
     el.addEventListener('click', () => _handleHotspotClick(hotspot));
-
     _elements.sceneHotspots.appendChild(el);
     _currentHotspots.push(hotspot);
+
+    // 2. 渲染调查线索列表项（可靠的可点击区域，不依赖背景图）
+    if (cluesEl) {
+      const clueBtn = document.createElement('button');
+      clueBtn.className = `clue-btn clue-${hotspot.type}`;
+      clueBtn.innerHTML = `<span class="clue-icon">${icon}</span><span class="clue-text">${hotspot.label || hotspot.id}</span>`;
+      clueBtn.addEventListener('click', () => _handleHotspotClick(hotspot));
+      cluesEl.appendChild(clueBtn);
+    }
   });
+}
+
+/**
+ * 清理对话系统残留状态（场景切换前调用）
+ */
+function _continueResolveCleanup() {
+  resetDialogueState();
 }
 
 /**
  * 渲染审讯场景
  * @param {Object} suspect - 嫌疑人数据（来自 characters.json 的角色对象）
  */
-export function renderInterrogationScene(suspect) {
+export async function renderInterrogationScene(suspect) {
+  console.log(`[DEBUG] renderInterrogationScene: 进入, suspect=`, suspect);
   if (!suspect) return;
+
+  // 兼容 suspects 为 ID 字符串的情况（从 caseData.suspects 查找完整对象）
+  if (typeof suspect === 'string') {
+    suspect = _caseData?.suspects?.find(s => (typeof s === 'object' ? s.id === suspect : s === suspect)) || { id: suspect, name: suspect };
+  }
 
   setCurrentSuspect(suspect.id);
   setPhase('interrogation');
   switchScreen('interrogation');
 
+  // 清理旧对话框和残留的 _continueResolve，避免上一轮对话未关闭导致冲突
+  _continueResolveCleanup();
+  hideDialogueOverlay();
+
   // 播放审讯场景BGM
-  playBGM('interrogation');
+  // 播放审讯BGM（案件2/3使用专属BGM）
+  const caseIdx = getCurrentCaseIndex();
+  const interrogationBGM = caseIdx >= 1 ? `interrogation_case${caseIdx + 1}` : 'interrogation';
+  playBGM(interrogationBGM);
 
   // 设置角色立绘
   if (suspect.portrait) {
@@ -271,13 +323,15 @@ export function renderInterrogationScene(suspect) {
   // 更新压力条
   _updateStressDisplay(suspect.id);
 
-  // Day2 已实现：渲染嫌疑人选择器 + 审讯开场对话
+  // 渲染嫌疑人选择器
   _renderSuspectSelector(suspect.id);
 
-  // 播放审讯开场对话（使用 dialogues.json 数据）
-  _playInterrogationOpening(suspect.id);
+  // await 开场对话，确保完成后玩家才能操作
+  console.log(`[DEBUG] renderInterrogationScene: 开始播放开场白`);
+  await _playInterrogationOpening(suspect.id);
+  console.log(`[DEBUG] renderInterrogationScene: 开场白播放完毕`);
 
-  console.log(`[sceneManager] 进入审讯: ${suspect.name}`);
+  console.log(`[sceneManager] 进入审讯: ${suspect.name || suspect.id}`);
 }
 
 function _renderSuspectSelector(currentSuspectId) {
@@ -297,15 +351,19 @@ function _renderSuspectSelector(currentSuspectId) {
 }
 
 async function _playInterrogationOpening(suspectId) {
+  console.log(`[DEBUG] _playInterrogationOpening: suspectId=${suspectId}`);
   // 优先从全局 dialoguesData 中获取开场白
   if (typeof window._dialoguesData !== 'undefined' && window._dialoguesData.dialogues?.interrogation_opening?.[suspectId]) {
     const openingDialogues = window._dialoguesData.dialogues.interrogation_opening[suspectId];
+    console.log(`[DEBUG] _playInterrogationOpening: 找到预设开场白, 数量=${openingDialogues.length}`);
     await showDialogueSequence(openingDialogues);
+    console.log(`[DEBUG] _playInterrogationOpening: 预设开场白播放完毕`);
     return;
   }
 
   // 多案件联调兜底：无预设开场白时，从 character 数据生成通用开场
   const suspect = _caseData?.suspects?.find(s => s.id === suspectId);
+  console.log(`[DEBUG] _playInterrogationOpening: 无预设开场白, 使用兜底, suspect=`, suspect);
   if (suspect) {
     await showDialogue({
       speaker: suspectId,
@@ -313,6 +371,7 @@ async function _playInterrogationOpening(suspectId) {
       type: 'normal',
       emotion: 'calm'
     });
+    console.log(`[DEBUG] _playInterrogationOpening: 兜底开场白播放完毕`);
   }
 }
 
@@ -321,7 +380,12 @@ async function _handleAskQuestion() {
   const state = getState();
   const suspectId = state.currentSuspect;
 
-  if (!suspectId) return;
+  console.log(`[DEBUG] _handleAskQuestion: suspectId=${suspectId}`);
+
+  if (!suspectId) {
+    console.log('[DEBUG] _handleAskQuestion: 无当前嫌疑人，返回');
+    return;
+  }
 
   // 获取该嫌疑人的问题列表（优先 dialogues.json，兜底从 character.lies 动态生成）
   let questions = [];
@@ -348,11 +412,16 @@ async function _handleAskQuestion() {
     ];
   }
 
+  console.log(`[DEBUG] _handleAskQuestion: questions=`, questions);
+  console.log(`[DEBUG] _handleAskQuestion: evidenceObtained=`, state.evidenceObtained);
+
   // 过滤需要证据才能解锁的问题
   const availableQuestions = questions.filter(q => {
     if (!q.requiresEvidence) return true;
     return state.evidenceObtained.includes(q.requiresEvidence);
   });
+
+  console.log(`[DEBUG] _handleAskQuestion: availableQuestions=`, availableQuestions);
 
   if (availableQuestions.length === 0) {
     await showDialogue({
@@ -371,7 +440,9 @@ async function _handleAskQuestion() {
     category: q.category
   }));
 
+  console.log(`[DEBUG] _handleAskQuestion: 调用 showOptions, options=`, options);
   const choice = await showOptions(options);
+  console.log(`[DEBUG] _handleAskQuestion: showOptions 返回, choice=`, choice);
 
   // Day3: 优先使用 AI 引擎
   if (isAPIAvailable()) {
@@ -388,7 +459,7 @@ async function _handleAskQuestion() {
           addStress(suspectId, aiResult.stressDelta);
         }
         if (aiResult.hasContradiction) {
-          addScore(10);
+          addScore(7);
         }
         _updateStressDisplay(suspectId);
 
@@ -433,6 +504,17 @@ async function _handlePressure() {
   const suspectId = state.currentSuspect;
 
   if (!suspectId) return;
+
+  // 施压次数限制：每名嫌疑人最多施压 3 次
+  const pressureCount = getFlag(`pressure_count_${suspectId}`) || 0;
+  if (pressureCount >= 3) {
+    await showDialogue({
+      speaker: 'system',
+      text: '该嫌疑人已经承受了多次施压，继续施压不会有更多效果。尝试用证据来突破防线吧。',
+      type: 'normal'
+    });
+    return;
+  }
 
   const stress = state.stressLevel[suspectId] || 0;
 
@@ -480,18 +562,18 @@ async function _handlePressure() {
   }
 
   // 离线模式：预设施压逻辑
-  addStress(suspectId, 15);
+  addStress(suspectId, 10);
   playSFX('stress_up');
   _updateStressDisplay(suspectId);
 
   let emotion = 'calm';
   let responseText = '';
-  const newStress = Math.min(100, stress + 15);
+  const newStress = Math.min(100, stress + 10);
 
-  if (newStress >= 67) {
+  if (newStress >= 70) {
     emotion = 'broken';
     responseText = '你...你别逼我！我说...我什么都说了！';
-  } else if (newStress >= 34) {
+  } else if (newStress >= 30) {
     emotion = 'nervous';
     responseText = '你...你在说什么？我不明白你的意思！';
   } else {
@@ -508,9 +590,12 @@ async function _handlePressure() {
 
   await showDialogue({
     speaker: 'system',
-    text: `【压力值 ${stress} → ${newStress}】`,
+    text: `【压力值 ${stress} → ${newStress}】（剩余施压次数：${2 - pressureCount}）`,
     type: 'narration'
   });
+
+  // 记录施压次数
+  setFlag(`pressure_count_${suspectId}`, pressureCount + 1);
 
   _checkEndingCondition(state);
 }
@@ -533,7 +618,7 @@ async function _generateQuestionResponse(suspectId, question, state) {
   if (lie && hasCounterEvidence) {
     // 玩家持有戳穿证据
     emotion = 'nervous';
-    stressDelta = 25;
+    stressDelta = 20;
     responseText = `${lie.truthText}（声音明显颤抖，不敢直视你的眼睛）`;
   } else if (question.category === 'evidence') {
     emotion = 'nervous';
@@ -566,7 +651,7 @@ async function _generateQuestionResponse(suspectId, question, state) {
       text: `【关键信息揭露！压力 +${stressDelta}】`,
       type: 'narration'
     });
-    addScore(20); // 戳穿谎言加分
+    addScore(12); // 戳穿谎言加分
   }
 
   // 检查结局
@@ -585,8 +670,8 @@ function _calculateEnding(state) {
     return match ? parseInt(match[1]) : null;
   };
 
-  const goodThreshold = getThreshold('ending_good') ?? 80;
-  const normalThreshold = getThreshold('ending_normal') ?? 40;
+  const goodThreshold = getThreshold('ending_good') ?? 120;
+  const normalThreshold = getThreshold('ending_normal') ?? 60;
 
   if (score >= goodThreshold) return 'ending_good';
   if (score >= normalThreshold) return 'ending_normal';
@@ -600,10 +685,10 @@ function _checkEndingCondition(state) {
   const endings = _caseData?.endings || {};
   const cond = endings.ending_good?.condition || '';
   const match = cond.match(/score\s*>=\s*(\d+)/);
-  const goodThreshold = match ? parseInt(match[1]) : 80;
+  const goodThreshold = match ? parseInt(match[1]) : 120;
 
   // 如果推理评分足够高且当前嫌疑人崩溃，自动触发好结局
-  if (score >= goodThreshold && stress >= 67) {
+  if (score >= goodThreshold && stress >= 80) {
     const endingId = _calculateEnding(state);
     setTimeout(() => _triggerEnding(endingId, score), 500);
   }
@@ -615,10 +700,23 @@ async function _handleEndCase() {
   const score = state.score || 0;
   const endingId = _calculateEnding(state);
 
+  // 检查未收集的证据（扣分惩罚）
+  const totalEvidenceIds = _evidenceData?.evidence
+    ?.filter(ev => ev.obtainedFrom && ev.obtainedFrom !== '组合解锁')
+    ?.map(ev => ev.id) || [];
+  const missingEvidence = totalEvidenceIds.filter(id => !state.evidenceObtained.includes(id));
+  const penalty = missingEvidence.length * 5;
+  const effectiveScore = score - penalty;
+
+  let penaltyText = '';
+  if (missingEvidence.length > 0) {
+    penaltyText = `（警告：还有 ${missingEvidence.length} 条线索未调查，将扣除 ${penalty} 分）`;
+  }
+
   // 显示确认提示
   await showDialogue({
     speaker: 'system',
-    text: `当前推理评分为 ${score}。你确定要结束案件并做出最终裁定吗？`,
+    text: `当前推理评分为 ${score}${penalty > 0 ? `，草草结案将有 ${penalty} 分扣减` : ''}。你确定要结束案件并做出最终裁定吗？`,
     type: 'normal'
   });
 
@@ -628,7 +726,21 @@ async function _handleEndCase() {
   ]);
 
   if (choice.target === 'confirm') {
-    _triggerEnding(endingId, score);
+    // 应用扣分
+    if (penalty > 0) {
+      for (let i = 0; i < missingEvidence.length; i++) {
+        addScore(-5);
+      }
+      const newScore = getState().score || 0;
+      await showDialogue({
+        speaker: 'system',
+        text: `因线索不完整，推理评分 ${score} → ${newScore}`,
+        type: 'narration'
+      });
+    }
+    const finalScore = getState().score || 0;
+    const finalEndingId = _calculateEnding(getState());
+    _triggerEnding(finalEndingId, finalScore);
   }
 }
 
@@ -789,6 +901,16 @@ export function renderBriefing() {
       <p>${victim.description || ''}</p>
     `;
   }
+
+  // 操作指引提示
+  const guideEl = document.getElementById('briefing-guide');
+  if (guideEl) {
+    guideEl.innerHTML = `
+      <div class="briefing-guide-item"><span class="guide-icon">🔍</span> 点击场景中发光的标记调查证据</div>
+      <div class="briefing-guide-item"><span class="guide-icon">🚪</span> 黄色标记可切换到其他场景</div>
+      <div class="briefing-guide-item"><span class="guide-icon">📋</span> 收集完证据后点击「开始审讯」</div>
+    `;
+  }
 }
 
 /**
@@ -893,8 +1015,10 @@ export async function startCase(caseIndex) {
     setGamePhase('briefing');
     renderBriefing();
 
-    // 播放调查BGM
-    playBGM('investigation');
+    // 播放案件切换音效 + 调查BGM（案件2/3使用专属BGM）
+    playSFX('case_switch');
+    const investigationBGM = caseIndex >= 1 ? `investigation_case${caseIndex + 1}` : 'investigation';
+    playBGM(investigationBGM);
 
     console.log(`[sceneManager] 开始案件 ${caseIndex}: ${caseData.title}`);
   } catch (e) {
@@ -931,7 +1055,8 @@ export async function endCaseAndReturnHub() {
   // 切换到 Hub 画面
   setGamePhase('hub');
   switchScreen('hub');
-  playBGM('menu'); // Hub 使用菜单BGM，待 C 组提供专属 bgm_hub
+  playSFX('case_switch');
+  playBGM('hub'); // Hub 专属BGM（C组已提供 bgm_hub.mp3）
 
   await _renderHub();
 
@@ -945,6 +1070,15 @@ export async function endCaseAndReturnHub() {
 async function _renderHub() {
   const state = getState();
   const results = getCasesResults();
+
+  // 0. 接入 Hub 事务所背景图（C组已提供 hub_office.png）
+  const hubBgEl = document.querySelector('#hub-screen .hub-bg');
+  if (hubBgEl) {
+    hubBgEl.style.backgroundImage = 'url(assets/bg/hub_office.png)';
+    hubBgEl.style.backgroundSize = 'cover';
+    hubBgEl.style.backgroundPosition = 'center';
+    hubBgEl.style.backgroundBlendMode = 'overlay';
+  }
 
   // 1. 渲染案件进度指示器
   _renderCaseIndicator(results);
@@ -1033,7 +1167,22 @@ function _renderCaseIndicator(results) {
 
     const dot = document.createElement('div');
     dot.className = 'hub-case-dot';
-    dot.textContent = result ? (result.ending === 'ending_good' ? '✓' : result.ending === 'ending_bad' ? '✗' : '—') : (i + 1);
+    // 使用 C 组提供的 UI 图标（case_progress_good/bad/locked.png）
+    if (result) {
+      if (result.ending === 'ending_good') {
+        dot.style.backgroundImage = 'url(assets/ui/case_progress_good.png)';
+      } else if (result.ending === 'ending_bad') {
+        dot.style.backgroundImage = 'url(assets/ui/case_progress_bad.png)';
+      } else {
+        dot.textContent = '—';
+      }
+    } else {
+      dot.style.backgroundImage = 'url(assets/ui/case_progress_locked.png)';
+      dot.classList.add('locked');
+    }
+    dot.style.backgroundSize = 'contain';
+    dot.style.backgroundRepeat = 'no-repeat';
+    dot.style.backgroundPosition = 'center';
     node.appendChild(dot);
 
     const label = document.createElement('div');
@@ -1063,7 +1212,15 @@ function _renderCaseIndicator(results) {
     node.className = 'hub-case-node' + (hiddenResult ? ' good active' : ' locked active');
     const dot = document.createElement('div');
     dot.className = 'hub-case-dot';
-    dot.textContent = hiddenResult ? '✓' : '?';
+    if (hiddenResult) {
+      dot.style.backgroundImage = 'url(assets/ui/case_progress_good.png)';
+    } else {
+      dot.style.backgroundImage = 'url(assets/ui/case_progress_locked.png)';
+      dot.classList.add('locked');
+    }
+    dot.style.backgroundSize = 'contain';
+    dot.style.backgroundRepeat = 'no-repeat';
+    dot.style.backgroundPosition = 'center';
     node.appendChild(dot);
     const label = document.createElement('div');
     label.className = 'hub-case-label';
@@ -1156,6 +1313,12 @@ async function _restoreFromSave() {
   }
 
   const state = data.state;
+  // 应用存档中的设置
+  if (state.settings) {
+    setMusicEnabled(state.settings.musicEnabled);
+    setAIEnabled(state.settings.aiEnabled);
+  }
+
   const gamePhase = state.gamePhase || 'menu';
   console.log('[sceneManager] 从存档恢复，gamePhase:', gamePhase, 'currentPhase:', state.currentPhase);
 
@@ -1206,7 +1369,7 @@ async function _restoreFromSave() {
       if (state.currentSuspect && _caseData) {
         const suspect = _caseData.suspects?.find(s => (typeof s === 'string' ? s === state.currentSuspect : s.id === state.currentSuspect));
         if (suspect) {
-          renderInterrogationScene(suspect);
+          await renderInterrogationScene(suspect);
         } else {
           switchScreen('menu');
         }
@@ -1259,9 +1422,10 @@ async function _handleHotspotClick(hotspot) {
         const added = addEvidence(hotspot.evidenceId);
         if (added) {
           playSFX('evidence_obtain');
+          const evData = getEvidenceData(hotspot.evidenceId);
           await showDialogue({
             speaker: 'system',
-            text: `获得证据：${hotspot.evidenceName || hotspot.evidenceId}`,
+            text: `获得证据：${evData?.name || hotspot.evidenceId}`,
             type: 'normal'
           });
         }
@@ -1270,6 +1434,7 @@ async function _handleHotspotClick(hotspot) {
 
     case 'move':
       if (hotspot.targetScene) {
+        playSFX('click');
         switchScene(hotspot.targetScene);
       }
       break;
@@ -1332,6 +1497,42 @@ async function _handleHotspotClick(hotspot) {
   if (currentScene && _scenesData[currentScene]) {
     _renderHotspots(_scenesData[currentScene].hotspots || []);
   }
+
+  // 检查当前案件所有证据是否已收集完毕
+  _checkAllEvidenceCollected();
+}
+
+/**
+ * 检查当前案件所有证据是否收集完毕，完毕则提示玩家
+ */
+function _checkAllEvidenceCollected() {
+  if (!_caseData?.scenes) return;
+  const state = getState();
+
+  // 收集当前案件所有场景中的证据 ID
+  const allEvidenceIds = new Set();
+  Object.values(_caseData.scenes).forEach(scene => {
+    (scene.hotspots || []).forEach(h => {
+      if (h.type === 'evidence' && h.evidenceId) {
+        allEvidenceIds.add(h.evidenceId);
+      }
+    });
+  });
+
+  if (allEvidenceIds.size === 0) return;
+
+  // 检查是否全部已获得
+  const allCollected = [...allEvidenceIds].every(id => state.evidenceObtained.includes(id));
+  if (allCollected && !getFlag('all_evidence_collected')) {
+    setFlag('all_evidence_collected', true);
+    setTimeout(async () => {
+      await showDialogue({
+        speaker: 'system',
+        text: '【所有证据已收集完毕】你可以前往审讯室对嫌疑人进行审讯了。',
+        type: 'normal'
+      });
+    }, 500);
+  }
 }
 
 async function _handleCharacterTalk(hotspot) {
@@ -1342,6 +1543,33 @@ async function _handleCharacterTalk(hotspot) {
   ];
   await showOptions(options);
   hideDialogueOverlay();
+}
+
+function _openSettings() {
+  const overlay = document.getElementById('settings-overlay');
+  if (!overlay) return;
+
+  const settings = getSettings();
+  const musicInput = document.getElementById('setting-music');
+  const aiInput = document.getElementById('setting-ai');
+  if (musicInput) musicInput.checked = settings.musicEnabled;
+  if (aiInput) aiInput.checked = settings.aiEnabled;
+
+  _updateSettingsStatus();
+  overlay.classList.remove('hidden');
+}
+
+function _closeSettings() {
+  const overlay = document.getElementById('settings-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+
+function _updateSettingsStatus() {
+  const statusEl = document.getElementById('settings-status');
+  if (!statusEl) return;
+  const available = isAPIAvailable();
+  statusEl.textContent = available ? 'AI 状态：在线（DeepSeek）' : 'AI 状态：离线（预设对话）';
+  statusEl.style.color = available ? 'var(--neon-green)' : 'var(--neon-yellow)';
 }
 
 // ====================
@@ -1355,12 +1583,41 @@ function _bindGlobalActions() {
     if (!btn) return;
 
     const action = btn.dataset.action;
+    console.log(`[DEBUG] _bindGlobalActions 点击: action=${action}, btn=`, btn);
     playSFX('click');
     _handleGlobalAction(action, btn);
   });
+
+  // 设置面板开关绑定
+  const musicInput = document.getElementById('setting-music');
+  const aiInput = document.getElementById('setting-ai');
+  if (musicInput) {
+    musicInput.addEventListener('change', (e) => {
+      const enabled = e.target.checked;
+      updateSettings({ musicEnabled: enabled });
+      setMusicEnabled(enabled);
+    });
+  }
+  if (aiInput) {
+    aiInput.addEventListener('change', (e) => {
+      const enabled = e.target.checked;
+      updateSettings({ aiEnabled: enabled });
+      setAIEnabled(enabled);
+      _updateSettingsStatus();
+    });
+  }
 }
 
 async function _handleGlobalAction(action, btn) {
+  console.log(`[DEBUG] _handleGlobalAction 进入: action=${action}, isDialogueBusy=${isDialogueBusy()}`);
+
+  // 审讯相关操作：如果对话正在进行（如开场白），忽略点击避免冲突
+  const interrogationActions = ['ask-question', 'pressure', 'present-evidence', 'combine-evidence', 'switch-suspect'];
+  if (interrogationActions.includes(action) && isDialogueBusy()) {
+    console.log(`[DEBUG] action=${action} 被拦截：对话进行中`);
+    return;
+  }
+
   switch (action) {
     case 'new-game':
       // 多案件扩展：从案件1开始全新流程
@@ -1392,21 +1649,40 @@ async function _handleGlobalAction(action, btn) {
     case 'go-interrogation':
       // 进入审讯场景
       if (_caseData && _caseData.suspects && _caseData.suspects.length > 0) {
-        renderInterrogationScene(_caseData.suspects[0]);
+        await renderInterrogationScene(_caseData.suspects[0]);
       }
       break;
 
-    case 'back-investigate':
+    case 'back-investigate': {
       // 返回调查场景
       const currentScene = getState().currentScene;
       if (currentScene) {
         switchScene(currentScene);
       }
       break;
+    }
 
     case 'back-menu':
       switchScreen('menu');
       playBGM('menu');
+      break;
+
+    case 'quit-game':
+      // 尝试关闭窗口（浏览器可能阻止，则提示玩家手动关闭）
+      window.close();
+      await showDialogue({
+        speaker: 'system',
+        text: '如果窗口没有自动关闭，请手动关闭浏览器标签页。感谢游玩！',
+        type: 'normal'
+      });
+      break;
+
+    case 'settings':
+      _openSettings();
+      break;
+
+    case 'close-settings':
+      _closeSettings();
       break;
 
     case 'back-hub':
@@ -1444,14 +1720,21 @@ async function _handleGlobalAction(action, btn) {
       await _handlePressure();
       break;
 
-    case 'switch-suspect':
+    case 'switch-suspect': {
       // 切换嫌疑人
       const targetId = btn?.dataset?.suspectId;
-      if (targetId && _caseData) {
-        const suspect = _caseData.suspects?.find(s => s.id === targetId);
-        if (suspect) renderInterrogationScene(suspect);
+      console.log(`[DEBUG] switch-suspect: targetId=${targetId}, suspects=`, _caseData?.suspects?.map(s => typeof s === 'object' ? s.id : s));
+      if (targetId && _caseData?.suspects) {
+        const suspect = _caseData.suspects.find(s =>
+          typeof s === 'object' ? s.id === targetId : s === targetId
+        );
+        console.log(`[DEBUG] switch-suspect: 找到嫌疑人=`, suspect);
+        if (suspect) await renderInterrogationScene(suspect);
+      } else {
+        console.log(`[DEBUG] switch-suspect: targetId 或 suspects 为空`);
       }
       break;
+    }
 
     case 'end-case':
       // Day4: 手动结束案件，根据当前评分触发结局
@@ -1485,14 +1768,18 @@ function _renderEvidenceList() {
     return;
   }
 
-  // TODO: 从 evidence.json 加载证据详情 - Day2 已修复
+  // 从 evidence.json 加载证据详情
   state.evidenceObtained.forEach(evidenceId => {
     const evData = getEvidenceData(evidenceId);
     const item = document.createElement('div');
     item.className = 'evidence-item';
     item.dataset.evidenceId = evidenceId;
+    // icon 字段是图片路径，用 <img> 渲染
+    const iconHtml = evData?.icon
+      ? `<img class="evidence-item-icon" src="${evData.icon}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
+      : `<span class="evidence-item-icon">📋</span>`;
     item.innerHTML = `
-      <div class="evidence-item-icon">${evData ? evData.icon : '📋'}</div>
+      ${iconHtml}
       <div class="evidence-item-name">${evData ? evData.name : evidenceId}</div>
     `;
     item.addEventListener('click', () => _showEvidenceDetail(evidenceId));
@@ -1549,21 +1836,35 @@ async function _handlePresentEvidence() {
     const item = document.createElement('div');
     item.className = 'evidence-item selectable';
     item.dataset.evidenceId = evId;
+    const iconHtml = evData?.icon
+      ? `<img class="evidence-item-icon" src="${evData.icon}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
+      : `<span class="evidence-item-icon">📋</span>`;
     item.innerHTML = `
-      <div class="evidence-item-icon">${evData ? evData.icon : '📋'}</div>
+      ${iconHtml}
       <div class="evidence-item-name">${evData ? evData.name : evId}</div>
       <div class="evidence-item-hint">点击出示</div>
     `;
     item.addEventListener('click', async () => {
-      await _doPresentEvidence(suspectId, evId);
-      // 关闭证据面板
+      // 先关闭证据面板，再显示对话
       _toggleEvidenceOverlay(false);
+      await _doPresentEvidence(suspectId, evId);
     });
     listEl.appendChild(item);
   });
 }
 
 async function _doPresentEvidence(suspectId, evidenceId) {
+  // 去重检查：同一证据对同一嫌疑人只能出示一次
+  const presentedFlag = `presented_${suspectId}_${evidenceId}`;
+  if (getFlag(presentedFlag)) {
+    await showDialogue({
+      speaker: 'system',
+      text: '这件证据已经向该嫌疑人出示过了，再出示也不会有新反应。',
+      type: 'normal'
+    });
+    return;
+  }
+
   await showDialogue({
     speaker: 'detective',
     text: `出示证据：${getEvidenceData(evidenceId)?.name || evidenceId}`,
@@ -1572,6 +1873,9 @@ async function _doPresentEvidence(suspectId, evidenceId) {
 
   // 调用 evidenceSystem 的 presentEvidence
   const result = await evidencePresent(suspectId, evidenceId);
+
+  // 标记已出示
+  setFlag(presentedFlag, true);
 
   // 显示嫌疑人回应
   await showDialogue({
@@ -1621,15 +1925,18 @@ async function _handleCombineEvidence() {
   // 重新渲染证据列表
   listEl.innerHTML = '';
   listEl.parentNode.insertBefore(hintEl, listEl);
-  hintEl.textContent = '🔗 选择两件证据进行组合推理...';
+  hintEl.innerHTML = '🔗 <strong>组合证据推理</strong>：选择两件证据，AI 会分析它们之间的关联并给出推理。成功的组合可加分并解锁新线索。';
 
   state.evidenceObtained.forEach(evId => {
     const evData = getEvidenceData(evId);
     const item = document.createElement('div');
     item.className = 'evidence-item';
     item.dataset.evidenceId = evId;
+    const iconHtml = evData?.icon
+      ? `<img class="evidence-item-icon" src="${evData.icon}" alt="${evData.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"><span class="evidence-item-icon-fallback" style="display:none">📋</span>`
+      : `<span class="evidence-item-icon">📋</span>`;
     item.innerHTML = `
-      <div class="evidence-item-icon">${evData ? evData.icon : '📋'}</div>
+      ${iconHtml}
       <div class="evidence-item-name">${evData ? evData.name : evId}</div>
       <div class="evidence-select-check">☐</div>
     `;
@@ -1684,18 +1991,36 @@ async function _doCombineEvidence(ev1, ev2) {
 
   // 调用 evidenceSystem 的 combineEvidence
   const result = await evidenceCombine(ev1, ev2);
-  playSFX('evidence_combine');
 
-  // 显示推理结果
+  // 根据组合是否成功播放不同音效
+  if (result.isRelevant) {
+    playSFX('contradiction');
+  } else {
+    playSFX('click');
+  }
+
+  // 显示推理结果（成功/失败有明确标识）
   await showDialogue({
     speaker: 'ai_assistant',
-    text: result.insight,
+    text: result.isRelevant
+      ? `🔗 【组合成功】${result.insight}`
+      : `🔗 【无关联】${result.insight}`,
     type: 'ai_generated'
   });
+
+  // 成功组合显示加分提示
+  if (result.isRelevant) {
+    await showDialogue({
+      speaker: 'system',
+      text: '【推理评分 +7】证据之间的关联被揭示。',
+      type: 'narration'
+    });
+  }
 
   // 如果解锁了新证据
   if (result.unlocksEvidence) {
     const newEvData = getEvidenceData(result.unlocksEvidence);
+    playSFX('evidence_obtain');
     await showDialogue({
       speaker: 'system',
       text: `🔓 发现新证据：${newEvData?.name || result.unlocksEvidence}`,

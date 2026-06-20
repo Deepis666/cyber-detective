@@ -9,11 +9,11 @@
 // 模块导入
 // ====================
 import { initDialogueSystem, showDialogue, showDialogueSequence, showOptions, hideDialogueOverlay, setSpeakerNameMap } from './modules/dialogueSystem.js';
-import { getState, onStateChange, resetState, hasSaveData, loadGame, saveGame, setPhase, addEvidence, getFlag, setFlag, addScore, getStress, getEmotion, addStress } from './modules/gameState.js';
+import { getState, onStateChange, resetState, hasSaveData, loadGame, saveGame, setPhase, addEvidence, getFlag, setFlag, addScore, getStress, getEmotion, addStress, getSettings, updateSettings } from './modules/gameState.js';
 import { initSceneManager, switchScreen, switchScene, renderBriefing, renderInterrogationScene, renderEnding, updateStressDisplay, updateScoreDisplay } from './modules/sceneManager.js';
 import { initEvidenceSystem, renderEvidenceBar, combineEvidence, presentEvidence, selectEvidence, getSelectedEvidence, clearSelectedEvidence, getEvidenceData } from './modules/evidenceSystem.js';
-import { initAudioManager, playBGM, playSFX, stopAllAudio } from './modules/audioManager.js';
-import { initAIEngine, interrogateAI, evidenceCombineAI, showAIThinking, fallbackResponse, isAPIAvailable } from './modules/aiEngine.js';
+import { initAudioManager, playBGM, playSFX, stopAllAudio, setMusicEnabled } from './modules/audioManager.js';
+import { initAIEngine, interrogateAI, evidenceCombineAI, showAIThinking, fallbackResponse, isAPIAvailable, setAIEnabled } from './modules/aiEngine.js';
 
 // ====================
 // 游戏数据
@@ -99,13 +99,19 @@ async function init() {
     return res.json();
   };
 
-  initSceneManager(_caseData.scenes, _caseData, _plotData, caseLoader);
+  initSceneManager(_caseData.scenes, _caseData, _plotData, caseLoader, _evidenceData);
   initEvidenceSystem(_evidenceData);
   initAudioManager();
 
   // Day3: 初始化 AI 引擎（注入游戏数据）
   initAIEngine(_charactersData, _evidenceData, _caseData);
   console.log('[main] AI 引擎状态:', isAPIAvailable() ? '在线模式' : '离线模式（未配置 API Key）');
+
+  // 应用玩家设置（音乐开关、AI 开关）
+  const settings = getSettings();
+  setMusicEnabled(settings.musicEnabled);
+  setAIEnabled(settings.aiEnabled);
+  console.log('[main] 玩家设置:', settings);
 
   // 设置角色名称映射
   const nameMap = {};

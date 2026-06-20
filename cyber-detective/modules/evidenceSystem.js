@@ -8,6 +8,8 @@
 import {
   addEvidence,
   markEvidenceExamined,
+  hasCombinedEvidence,
+  markEvidenceCombined,
   addStress,
   addScore,
   getFlag,
@@ -172,7 +174,12 @@ export async function combineEvidence(ev1, ev2) {
     try {
       const aiResult = await evidenceCombineAI({ ev1, ev2 });
       if (aiResult) {
-        addScore(aiResult.isRelevant ? 10 : 0);
+        // 去重：仅首次组合且相关时加分
+        const alreadyCombined = hasCombinedEvidence(ev1, ev2);
+        if (aiResult.isRelevant && !alreadyCombined) {
+          addScore(7);
+          markEvidenceCombined(ev1, ev2);
+        }
         return aiResult;
       }
     } catch (e) {
@@ -182,14 +189,21 @@ export async function combineEvidence(ev1, ev2) {
 
   // 离线模式：使用预设逻辑
   const canCombine = _canCombine(ev1Data, ev2Data);
+  const alreadyCombined = hasCombinedEvidence(ev1, ev2);
 
   if (canCombine) {
     const unlockedEvidence = _checkUnlockEvidence(ev1, ev2);
-    addScore(10);
+    // 去重：仅首次组合加分
+    if (!alreadyCombined) {
+      addScore(7);
+      markEvidenceCombined(ev1, ev2);
+    }
 
     return {
       isRelevant: true,
-      insight: _generatePresetInsight(ev1Data, ev2Data, unlockedEvidence),
+      insight: alreadyCombined
+        ? `（已分析过）${_generatePresetInsight(ev1Data, ev2Data, unlockedEvidence)}`
+        : _generatePresetInsight(ev1Data, ev2Data, unlockedEvidence),
       unlocksEvidence: unlockedEvidence
     };
   }
@@ -239,7 +253,7 @@ export async function presentEvidence(suspectId, evidenceId) {
           addStress(suspectId, aiResult.stressDelta);
         }
         if (aiResult.hasContradiction) {
-          addScore(15);
+          addScore(10);
         }
         return {
           response: aiResult.response,
@@ -256,9 +270,9 @@ export async function presentEvidence(suspectId, evidenceId) {
   const isRelated = evData.relatedTo && evData.relatedTo.includes(suspectId);
 
   if (isRelated) {
-    const stressDelta = 20;
+    const stressDelta = 15;
     addStress(suspectId, stressDelta);
-    addScore(15);
+    addScore(10);
 
     return {
       response: `（嫌疑人看到${evData.name}后明显动摇）这...这不能说明什么！你凭什么...`,
@@ -267,6 +281,8 @@ export async function presentEvidence(suspectId, evidenceId) {
     };
   }
 
+  // 出示无关证据：小扣分惩罚
+  addScore(-3);
   return {
     response: `（嫌疑人看了一眼${evData.name}）这和我有什么关系？你在浪费时间。`,
     stressDelta: 0,
@@ -292,13 +308,13 @@ function _canCombine(ev1Data, ev2Data) {
 }
 
 function _checkUnlockEvidence(ev1, ev2) {
-  // 特殊组合：evidence_001 + evidence_003 解锁 evidence_005
-  const combo1 = ['evidence_001', 'evidence_003'];
+  // 案件1组合解锁：监控记录碎片 + 破损的数据芯片 → 林小北的加密备忘录（只能通过组合获得）
+  const combo1 = ['evidence_002', 'evidence_004'];
   if (combo1.includes(ev1) && combo1.includes(ev2)) {
     const state = getState();
-    if (!state.evidenceObtained.includes('evidence_005')) {
-      addEvidence('evidence_005');
-      return 'evidence_005';
+    if (!state.evidenceObtained.includes('evidence_006')) {
+      addEvidence('evidence_006');
+      return 'evidence_006';
     }
   }
 

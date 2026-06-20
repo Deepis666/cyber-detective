@@ -14,15 +14,15 @@
 // ====================
 const STORAGE_KEY = 'cyber_detective_save';
 const STRESS_EMOTION_THRESHOLD = {
-  calm: { min: 0, max: 33 },
-  nervous: { min: 34, max: 66 },
-  broken: { min: 67, max: 100 }
+  calm: { min: 0, max: 29 },
+  nervous: { min: 30, max: 69 },
+  broken: { min: 70, max: 100 }
 };
 
 // 主线案件数量（不含隐藏案件）
 const TOTAL_MAIN_CASES = 3;
 // 好结局分数阈值
-const GOOD_ENDING_SCORE = 80;
+const GOOD_ENDING_SCORE = 120;
 
 // ====================
 // 单案件层默认状态（切换案件时重置为此）
@@ -33,6 +33,7 @@ const defaultSingleCaseState = {
   currentSuspect: null,        // 当前审讯嫌疑人 ID
   evidenceObtained: [],        // 已获得证据 ID 列表
   evidenceExamined: [],        // 已查看证据 ID 列表
+  evidenceCombined: [],        // 已组合过的证据对 ['ev1+ev2', ...]（防止重复加分）
   dialogueHistory: [],         // 对话历史（用于 AI 上下文）
   stressLevel: {},             // 各嫌疑人压力值 0-100（按案件动态填充）
   score: 0,                    // 推理评分
@@ -50,6 +51,10 @@ const defaultState = {
   casesResults: [],            // [{ caseId, ending, score, keyFlags }]
   unlockedHiddenCase: false,   // 是否解锁隐藏案件
   globalFlags: {},             // 跨案件剧情标记
+  settings: {                  // 玩家设置（持久化）
+    musicEnabled: true,
+    aiEnabled: true
+  },
 
   // === 单案件层 ===
   ...JSON.parse(JSON.stringify(defaultSingleCaseState))
@@ -174,6 +179,30 @@ export function markEvidenceExamined(evidenceId) {
 }
 
 /**
+ * 检查两件证据是否已组合过（防止重复加分）
+ * @param {string} ev1
+ * @param {string} ev2
+ * @returns {boolean}
+ */
+export function hasCombinedEvidence(ev1, ev2) {
+  const key = [ev1, ev2].sort().join('+');
+  return _state.evidenceCombined.includes(key);
+}
+
+/**
+ * 标记两件证据已组合过
+ * @param {string} ev1
+ * @param {string} ev2
+ */
+export function markEvidenceCombined(ev1, ev2) {
+  const key = [ev1, ev2].sort().join('+');
+  if (!_state.evidenceCombined.includes(key)) {
+    _state.evidenceCombined.push(key);
+    _notify({ evidenceCombined: _state.evidenceCombined });
+  }
+}
+
+/**
  * 增加嫌疑人压力值
  * @param {string} suspectId
  * @param {number} delta - 增量（可负）
@@ -261,6 +290,28 @@ export function setGlobalFlag(flag, value) {
  */
 export function getGlobalFlag(flag) {
   return _state.globalFlags[flag];
+}
+
+// ====================
+// Public API - 玩家设置
+// ====================
+
+/**
+ * 获取当前玩家设置
+ * @returns {{musicEnabled: boolean, aiEnabled: boolean}}
+ */
+export function getSettings() {
+  return _deepClone(_state.settings || { musicEnabled: true, aiEnabled: true });
+}
+
+/**
+ * 更新玩家设置
+ * @param {Object} patch - 要更新的设置项
+ */
+export function updateSettings(patch) {
+  if (!patch || typeof patch !== 'object') return;
+  _state.settings = { ...(_state.settings || { musicEnabled: true, aiEnabled: true }), ...patch };
+  _notify({ settings: _deepClone(_state.settings) });
 }
 
 /**
@@ -490,7 +541,9 @@ export function isAllMainCasesCompleted() {
  * 重置状态到默认（完全重置，新游戏）
  */
 export function resetState() {
+  const savedSettings = _state.settings ? _deepClone(_state.settings) : { musicEnabled: true, aiEnabled: true };
   _state = JSON.parse(JSON.stringify(defaultState));
+  _state.settings = savedSettings;
   _notify({});
 }
 
@@ -533,6 +586,9 @@ export function loadGame() {
       if (!merged.gamePhase) merged.gamePhase = 'menu';
       if (!Array.isArray(merged.casesResults)) merged.casesResults = [];
       if (!merged.globalFlags) merged.globalFlags = {};
+      if (!merged.settings || typeof merged.settings !== 'object') {
+        merged.settings = { musicEnabled: true, aiEnabled: true };
+      }
       _state = merged;
       _notify({});
       console.log('[gameState] 读档成功，gamePhase:', _state.gamePhase, '存档时间:', data.savedAt);

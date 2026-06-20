@@ -14,7 +14,7 @@
   },
   "suspects": ["suspect_201", "suspect_202", "suspect_203"],
   "truth": {
-    "killerId": "suspect_201",
+    "killerId": "suspect_202",
     "motive": "钱致远发现了'创世纪'计划的核心数据——锐义科技正在利用下城区义体植入者的神经信号进行意识复刻实验，并在黑市出售'数字克隆体'。方明辉作为CTO负责销毁证据，但钱致远已经将关键数据备份到了一个物理隔离的'数据保险箱'中",
     "weapon": "定制神经病毒'蓝屏'，通过机房物理接口注入，绕过所有防火墙直接攻击脑机协议",
     "keyEvidence": ["evidence_201", "evidence_202"]
@@ -24,7 +24,7 @@
       "id": "scene_201",
       "name": "数据中心·核心机房",
       "description": "47层的核心机房被冷蓝色LED灯笼罩，空气中弥漫着服务器散热的干燥气息。钱致远的尸体瘫坐在主控台前，面部泛着病态的蓝光，像一尊被冰封的雕像。他面前的全息屏还在闪烁——最后一条指令被截断在执行途中。地板上有一行被匆忙擦拭过的鞋印，从主控台延伸到机房角落的物理接口柜。",
-      "bgImage": "assets/bg/case002_scene_1.png",
+      "bgImage": "assets/bg/scene_201.png",
       "hotspots": [
         { "id": "examine_201", "label": "检查物理接口柜", "type": "evidence", "evidenceId": "evidence_201", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_201", "label": "前往CTO办公室", "type": "move", "targetScene": "scene_202", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -34,7 +34,7 @@
       "id": "scene_202",
       "name": "CTO办公室·方明辉",
       "description": "方明辉的办公室在46层，落地窗俯瞰整个尖塔区。桌面整洁得近乎强迫症——但抽屉里有一张被反复折叠的纸条，上面手写着'蜂巢已沉默'。书架后方有一道隐蔽的生物锁，通往一间没有在公司蓝图上标注的房间。",
-      "bgImage": "assets/bg/case002_scene_2.png",
+      "bgImage": "assets/bg/scene_202.png",
       "hotspots": [
         { "id": "examine_202", "label": "检查隐蔽房间", "type": "evidence", "evidenceId": "evidence_202", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_202", "label": "前往安全监控室", "type": "move", "targetScene": "scene_203", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -44,7 +44,7 @@
       "id": "scene_203",
       "name": "安全监控室",
       "description": "监控室的三十六块屏幕中有四块显示着案发时段的录像——全是雪花。安保主管说这是'系统例行维护'，但维护记录显示下次维护是在两周后。角落的操作台上有一枚被遗忘的U盘，上面刻着'蜂巢·最终备份'。",
-      "bgImage": "assets/bg/case002_scene_3.png",
+      "bgImage": "assets/bg/scene_203.png",
       "hotspots": [
         { "id": "examine_203", "label": "检查蜂巢U盘", "type": "evidence", "evidenceId": "evidence_203", "position": { "top": "40%", "left": "50%", "width": "80px", "height": "80px" }, "once": true },
         { "id": "move_203", "label": "返回核心机房", "type": "move", "targetScene": "scene_201", "position": { "top": "80%", "left": "80%", "width": "80px", "height": "80px" } }
@@ -52,8 +52,8 @@
     }
   },
   "endings": {
-    "ending_good": { "condition": "score >= 80", "title": "数据坟场", "description": "你破解了'蜂巢'的最终备份，找到了'创世纪'计划的核心数据链。方明辉在铁证面前崩溃，交代了锐义科技利用下城区义体使用者进行意识复刻的全部流程。钱致远的数据保险箱成为压垮锐义科技的最后一根稻草。" },
-    "ending_normal": { "condition": "score >= 40", "title": "断链", "description": "你抓到了方明辉销毁证据的把柄，但'蜂巢'的最终备份始终没能解密。钱致远到底发现了什么，可能永远随他一起沉默了。锐义科技受到处罚，但核心秘密仍然深埋在数据的深渊中。" },
-    "ending_bad": { "condition": "score < 40", "title": "格式化", "description": "所有电子证据在48小时内被远程擦除，物理接口柜的记录被覆写，安保录像被'系统故障'完美掩盖。方明辉以证人身份出现在新闻发布会上，宣布'锐义科技将加强数据安全'。钱致远的死因被归类为'神经接口过敏反应'——在新香港，这不是第一次了。" }
+    "ending_good": { "condition": "score >= 120", "title": "数据坟场", "description": "你破解了'蜂巢'的最终备份，找到了'创世纪'计划的核心数据链。方明辉在铁证面前崩溃，交代了锐义科技利用下城区义体使用者进行意识复刻的全部流程。钱致远的数据保险箱成为压垮锐义科技的最后一根稻草。" },
+    "ending_normal": { "condition": "score >= 60", "title": "断链", "description": "你抓到了方明辉销毁证据的把柄，但'蜂巢'的最终备份始终没能解密。钱致远到底发现了什么，可能永远随他一起沉默了。锐义科技受到处罚，但核心秘密仍然深埋在数据的深渊中。" },
+    "ending_bad": { "condition": "score < 60", "title": "格式化", "description": "所有电子证据在48小时内被远程擦除，物理接口柜的记录被覆写，安保录像被'系统故障'完美掩盖。方明辉以证人身份出现在新闻发布会上，宣布'锐义科技将加强数据安全'。钱致远的死因被归类为'神经接口过敏反应'——在新香港，这不是第一次了。" }
   }
 }

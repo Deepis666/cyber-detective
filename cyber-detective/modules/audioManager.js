@@ -11,6 +11,8 @@
 // ====================
 const _audioCache = {};
 let _currentBGM = null;
+let _musicEnabled = true;     // 音乐开关状态
+let _currentBGMTrackId = null; // 记录当前应播放的 BGM 轨道，用于静音恢复
 
 // ====================
 // 音频配置
@@ -29,16 +31,22 @@ const AUDIO_CONFIG = {
 const AUDIO_MAP = {
   bgm: {
     investigation: 'assets/audio/bgm_investigation.wav',
+    investigation_case2: 'assets/audio/bgm_investigate.mp3',
+    investigation_case3: 'assets/audio/bgm_investigate.mp3',
     interrogation: 'assets/audio/bgm_interrogation.wav',
+    interrogation_case2: 'assets/audio/bgm_interrogation.mp3',
+    interrogation_case3: 'assets/audio/bgm_interrogation.mp3',
     menu: 'assets/audio/bgm_menu.wav',
-    ending: 'assets/audio/bgm_ending.wav'
+    ending: 'assets/audio/bgm_ending.wav',
+    hub: 'assets/audio/bgm_hub.mp3'
   },
   sfx: {
     evidence_obtain: 'assets/audio/sfx_evidence.wav',
     evidence_combine: 'assets/audio/sfx_combine.wav',
     click: 'assets/audio/sfx_click.wav',
     contradiction: 'assets/audio/sfx_contradiction.wav',
-    stress_up: 'assets/audio/sfx_stress.wav'
+    stress_up: 'assets/audio/sfx_stress.wav',
+    case_switch: 'assets/audio/sfx_case_switch.wav'
   },
   voice: {
     suspect_001_opening: 'assets/audio/voice_lin_opening.wav',
@@ -87,6 +95,16 @@ export function playBGM(trackId, options = {}) {
   // 停止当前 BGM
   if (_currentBGM) {
     _fadeStopBGM();
+  }
+
+  _currentBGMTrackId = trackId;
+
+  // 如果音乐已关闭，仅记录轨道，不实际播放
+  if (!_musicEnabled) {
+    if (_currentBGM) {
+      _fadeStopBGM();
+    }
+    return;
   }
 
   const audio = _audioCache[`bgm_${trackId}`];
@@ -186,6 +204,30 @@ export function stopAllAudio() {
     audio.currentTime = 0;
   });
   _currentBGM = null;
+}
+
+/**
+ * 设置音乐开关
+ * @param {boolean} enabled
+ */
+export function setMusicEnabled(enabled) {
+  _musicEnabled = enabled;
+
+  if (!_musicEnabled) {
+    // 关闭音乐：停止当前 BGM
+    stopBGM();
+  } else if (_currentBGMTrackId) {
+    // 开启音乐：恢复当前应播放的 BGM
+    playBGM(_currentBGMTrackId);
+  }
+}
+
+/**
+ * 获取当前音乐开关状态
+ * @returns {boolean}
+ */
+export function isMusicEnabled() {
+  return _musicEnabled;
 }
 
 /**

@@ -17,7 +17,7 @@
       "description": "公寓走廊监控的一段破损数据片段。经技术还原，显示案发当晚凌晨2:15，一个与林小北身形相似的人影从404室方向匆匆离开，并非其所称的一直在工坊。",
       "type": "digital",
       "obtainedFrom": "scene_corridor",
-      "canCombineWith": ["evidence_003"],
+      "canCombineWith": ["evidence_003", "evidence_004"],
       "relatedTo": ["suspect_001"]
     },
     {
@@ -51,6 +51,16 @@
       "relatedTo": ["suspect_001"]
     },
     {
+      "id": "evidence_006",
+      "name": "林小北的加密备忘录",
+      "icon": "assets/ui/evidence_chip.png",
+      "description": "通过组合「监控记录碎片」与「破损的数据芯片」解码出的隐藏备忘录。记录了林小北与新人类集团对接人的完整通讯时间线，包括案发当晚的最终指令接收时间——恰好比陈老九的死亡时间早4分钟。这是证明林小北受指使作案的铁证，无法通过场景调查获得。",
+      "type": "digital",
+      "obtainedFrom": "组合解锁",
+      "canCombineWith": [],
+      "relatedTo": ["suspect_001"]
+    },
+    {
       "id": "evidence_201",
       "name": "物理接口柜残留",
       "icon": "assets/ui/evidence_chip.png",
@@ -58,7 +68,7 @@
       "type": "digital",
       "obtainedFrom": "scene_201",
       "canCombineWith": ["evidence_202", "evidence_203"],
-      "relatedTo": ["suspect_201"]
+      "relatedTo": ["suspect_202"]
     },
     {
       "id": "evidence_202",
@@ -68,7 +78,7 @@
       "type": "digital",
       "obtainedFrom": "scene_202",
       "canCombineWith": ["evidence_201", "evidence_203"],
-      "relatedTo": ["suspect_201", "suspect_203"]
+      "relatedTo": ["suspect_202", "suspect_201"]
     },
     {
       "id": "evidence_203",
@@ -78,7 +88,7 @@
       "type": "digital",
       "obtainedFrom": "scene_203",
       "canCombineWith": ["evidence_201", "evidence_202"],
-      "relatedTo": ["suspect_202", "suspect_203"]
+      "relatedTo": ["suspect_203", "suspect_201"]
     },
     {
       "id": "evidence_301",
@@ -88,7 +98,7 @@
       "type": "physical",
       "obtainedFrom": "scene_301",
       "canCombineWith": ["evidence_302", "evidence_303"],
-      "relatedTo": ["suspect_301", "suspect_303"]
+      "relatedTo": ["suspect_302", "suspect_303"]
     },
     {
       "id": "evidence_302",
@@ -98,7 +108,7 @@
       "type": "digital",
       "obtainedFrom": "scene_302",
       "canCombineWith": ["evidence_301", "evidence_303"],
-      "relatedTo": ["suspect_301"]
+      "relatedTo": ["suspect_302"]
     },
     {
       "id": "evidence_303",
@@ -108,7 +118,7 @@
       "type": "physical",
       "obtainedFrom": "scene_303",
       "canCombineWith": ["evidence_301", "evidence_302"],
-      "relatedTo": ["suspect_301", "suspect_303"]
+      "relatedTo": ["suspect_302", "suspect_303"]
     },
     {
       "id": "evidence_401",

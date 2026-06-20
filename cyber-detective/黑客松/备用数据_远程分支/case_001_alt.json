@@ -1,0 +1,35 @@
+{
+  "caseId": "case_001",
+  "title": "霓虹公寓谋杀案",
+  "setting": {
+    "time": "2087年11月15日凌晨2点",
+    "location": "新香港·下城区·霓虹公寓404室",
+    "background": "死者是一名黑市义体医生，在非法神经植入领域颇有名气。案发当晚房门反锁，窗户紧闭，无强行闯入痕迹，现场发现死者后脑的神经接口被暴力拔出，但屋内财物完好。"
+  },
+  "victim": {
+    "name": "陈老九",
+    "identity": "黑市义体医生",
+    "description": "60岁，在地下诊所行医20年，专门为底层居民安装廉价神经接口和二手义肢。性格孤僻，独居，但与三个嫌疑人各有往来。"
+  },
+  "suspects": ["suspect_001", "suspect_002", "suspect_003"],
+  "truth": {
+    "killerId": "suspect_001",
+    "motive": "死者掌握了嫌疑人从事非法义体实验的证据，并威胁向其背后的公司举报",
+    "weapon": "改装电磁脉冲注射器",
+    "keyEvidence": ["evidence_003", "evidence_005"]
+  },
+  "endings": {
+    "ending_good": {
+      "condition": "score >= 80",
+      "title": "真相大白"
+    },
+    "ending_normal": {
+      "condition": "score >= 40",
+      "title": "疑案悬置"
+    },
+    "ending_bad": {
+      "condition": "score < 40",
+      "title": "错判冤案"
+    }
+  }
+}

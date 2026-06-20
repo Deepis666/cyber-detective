@@ -29,6 +29,8 @@
         <div class="menu-buttons">
           <button class="cyber-btn" data-action="new-game">新游戏</button>
           <button class="cyber-btn" data-action="continue" disabled>继续游戏</button>
+          <button class="cyber-btn" data-action="settings">设置</button>
+          <button class="cyber-btn" data-action="quit-game">退出游戏</button>
         </div>
         <p class="version-text">v1.0.0 | 腾讯云黑客松</p>
       </div>
@@ -44,6 +46,7 @@
         <div class="briefing-body">
           <div id="briefing-setting"></div>
           <div id="briefing-victim"></div>
+          <div id="briefing-guide" class="briefing-guide"></div>
         </div>
         <div class="briefing-footer">
           <button class="cyber-btn" data-action="start-investigation">开始调查</button>
@@ -57,6 +60,8 @@
         <div id="scene-image" class="scene-bg"></div>
         <div id="scene-hotspots" class="hotspot-layer"></div>
       </div>
+      <!-- 调查线索列表（替代绝对定位热点，不依赖背景图位置） -->
+      <div id="investigation-clues" class="investigation-clues"></div>
       <!-- 顶部信息栏 -->
       <div class="top-bar">
         <div class="phase-label">调查阶段</div>
@@ -66,6 +71,7 @@
         </div>
         <button class="cyber-btn-sm" data-action="open-evidence">证据栏</button>
         <button class="cyber-btn-sm" data-action="go-interrogation">开始审讯</button>
+        <button class="cyber-btn-sm" data-action="back-menu">返回主菜单</button>
       </div>
     </div>
 
@@ -109,6 +115,7 @@
             <button class="cyber-btn-sm" data-action="open-evidence">证据栏</button>
             <button class="cyber-btn-sm" data-action="back-investigate">返回调查</button>
             <button class="cyber-btn-sm end-case-btn" data-action="end-case">结束案件</button>
+            <button class="cyber-btn-sm" data-action="back-menu">返回主菜单</button>
           </div>
           <!-- 嫌疑人选择器 -->
           <div id="suspect-selector" class="suspect-selector">
@@ -155,6 +162,7 @@
           <div class="hub-actions">
             <button class="cyber-btn" data-action="review-case">回顾案件卷宗</button>
             <button id="hub-next-btn" class="cyber-btn hub-next-btn" data-action="next-case">开始调查</button>
+            <button class="cyber-btn-sm" data-action="back-menu">返回主菜单</button>
           </div>
         </div>
       </div>
@@ -178,6 +186,41 @@
         <div id="ending-score" class="ending-score"></div>
         <button class="cyber-btn" data-action="back-hub">返回事务所</button>
         <button class="cyber-btn" data-action="back-menu">返回主菜单</button>
+      </div>
+    </div>
+
+    <!-- 设置面板（全局覆盖层） -->
+    <div id="settings-overlay" class="settings-overlay hidden">
+      <div class="settings-panel">
+        <div class="settings-header">
+          <h3 class="neon-text">系统设置</h3>
+          <button class="cyber-btn-sm" data-action="close-settings">关闭</button>
+        </div>
+        <div class="settings-list">
+          <div class="settings-item">
+            <div class="settings-info">
+              <span class="settings-label">背景音乐</span>
+              <span class="settings-desc">开启或关闭游戏 BGM</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-music" data-setting="music" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-item">
+            <div class="settings-info">
+              <span class="settings-label">AI 对话</span>
+              <span class="settings-desc">开启时使用在线 AI 模型；关闭时使用离线预设对话</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="setting-ai" data-setting="ai" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-footer">
+          <span class="settings-status" id="settings-status">AI 状态：检测中…</span>
+        </div>
       </div>
     </div>
 

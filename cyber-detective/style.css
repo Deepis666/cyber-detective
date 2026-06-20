@@ -298,6 +298,45 @@ html, body {
 }
 
 /* ---------- Top Bar ---------- */
+/* 调查线索列表（不依赖背景图位置的可点击区域） */
+.investigation-clues {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 200px;
+}
+.clue-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(13, 13, 26, 0.85);
+  border: 1px solid var(--border-glow);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--speed-fast) ease;
+  text-align: left;
+  backdrop-filter: blur(6px);
+}
+.clue-btn:hover {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 240, 255, 0.1);
+  transform: translateX(4px);
+}
+.clue-icon { font-size: 1rem; flex-shrink: 0; }
+.clue-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.clue-evidence { border-color: rgba(255, 0, 229, 0.3); }
+.clue-evidence:hover { border-color: var(--neon-magenta); background: rgba(255, 0, 229, 0.1); }
+.clue-move { border-color: rgba(255, 230, 0, 0.3); }
+.clue-move:hover { border-color: var(--neon-yellow); background: rgba(255, 230, 0, 0.1); }
+
 .top-bar {
   position: absolute;
   top: 0;
@@ -309,6 +348,10 @@ html, body {
   padding: 0.8rem 1.5rem;
   background: linear-gradient(180deg, rgba(10, 10, 18, 0.9) 0%, transparent 100%);
   z-index: 20;
+  pointer-events: none; /* 让非按钮区域点击穿透 */
+}
+.top-bar > * {
+  pointer-events: auto; /* top-bar 内的按钮恢复可点击 */
 }
 
 .phase-label {
@@ -415,6 +458,27 @@ html, body {
   text-align: center;
 }
 
+/* 案件简报操作指引 */
+.briefing-guide {
+  margin-top: 1.5rem;
+  padding: 1rem 1.2rem;
+  background: rgba(0, 240, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 6px;
+}
+.briefing-guide-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 0.3rem 0;
+}
+.briefing-guide-item .guide-icon {
+  font-size: 1.1rem;
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.4));
+}
+
 /* ---------- Investigate Screen ---------- */
 #investigate-screen {
   background: var(--bg-dark);
@@ -448,17 +512,91 @@ html, body {
   cursor: pointer;
   transition: all var(--speed-fast) ease;
   animation: hotspot-pulse 2s infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
 }
 
 .hotspot:hover {
   border-color: var(--neon-cyan);
   background: rgba(0, 240, 255, 0.15);
   box-shadow: var(--glow-cyan);
+  transform: scale(1.05);
 }
+
+/* 热点图标 */
+.hotspot-icon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.6));
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* 热点常驻标签 */
+.hotspot-label {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: var(--neon-cyan);
+  background: rgba(10, 10, 18, 0.85);
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  pointer-events: none;
+  font-family: var(--font-mono);
+}
+
+/* 按类型区分热点样式 */
+.hotspot-move {
+  border-color: rgba(255, 230, 0, 0.4);
+  background: rgba(255, 230, 0, 0.06);
+  animation: hotspot-pulse-move 2s infinite;
+}
+.hotspot-move .hotspot-icon { filter: drop-shadow(0 0 6px rgba(255, 230, 0, 0.6)); }
+.hotspot-move .hotspot-label { color: var(--neon-yellow); border-color: rgba(255, 230, 0, 0.2); }
+.hotspot-move:hover { border-color: var(--neon-yellow); background: rgba(255, 230, 0, 0.15); box-shadow: 0 0 10px rgba(255, 230, 0, 0.4); }
+
+.hotspot-evidence {
+  border-color: rgba(255, 0, 229, 0.4);
+  background: rgba(255, 0, 229, 0.06);
+  animation: hotspot-pulse-evidence 2s infinite;
+}
+.hotspot-evidence .hotspot-icon { filter: drop-shadow(0 0 6px rgba(255, 0, 229, 0.6)); }
+.hotspot-evidence .hotspot-label { color: var(--neon-magenta); border-color: rgba(255, 0, 229, 0.2); }
+.hotspot-evidence:hover { border-color: var(--neon-magenta); background: rgba(255, 0, 229, 0.15); box-shadow: var(--glow-magenta); }
+
+.hotspot-talk {
+  border-color: rgba(57, 255, 20, 0.4);
+  background: rgba(57, 255, 20, 0.06);
+}
+.hotspot-talk .hotspot-icon { filter: drop-shadow(0 0 6px rgba(57, 255, 20, 0.6)); }
+.hotspot-talk .hotspot-label { color: var(--neon-green); border-color: rgba(57, 255, 20, 0.2); }
+.hotspot-talk:hover { border-color: var(--neon-green); background: rgba(57, 255, 20, 0.15); box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
 
 @keyframes hotspot-pulse {
   0%, 100% { border-color: rgba(0, 240, 255, 0.3); }
   50% { border-color: rgba(0, 240, 255, 0.6); }
+}
+@keyframes hotspot-pulse-move {
+  0%, 100% { border-color: rgba(255, 230, 0, 0.3); }
+  50% { border-color: rgba(255, 230, 0, 0.6); }
+}
+@keyframes hotspot-pulse-evidence {
+  0%, 100% { border-color: rgba(255, 0, 229, 0.3); }
+  50% { border-color: rgba(255, 0, 229, 0.6); }
+}
+
+/* 证据图标 img 样式 */
+.evidence-item-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: inline-block;
 }
 
 /* ---------- Interrogation Screen ---------- */
@@ -674,6 +812,7 @@ html, body {
 .interrogation-panel {
   width: 60%;
   position: relative;
+  padding-top: 3.5rem; /* 避开 top-bar 绝对定位的遮挡 */
 }
 
 /* ---------- Ending Screen ---------- */
@@ -706,15 +845,22 @@ html, body {
 /* ---------- Dialogue Overlay ---------- */
 .dialogue-overlay {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  padding: 0 1.5rem 1.5rem;
+  inset: 0;
+  z-index: 80;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 1.5rem 1.5rem;
   gap: 0.8rem;
   transition: opacity var(--speed-fast) ease;
+  background: linear-gradient(180deg, transparent 0%, transparent 50%, rgba(10, 10, 18, 0.5) 100%);
+  /* 上半部分不拦截点击，让审讯按钮/调查热点可交互 */
+  pointer-events: none;
+}
+/* 对话框和选项面板本身需要接收点击 */
+.dialogue-overlay .dialogue-box,
+.dialogue-overlay .options-container {
+  pointer-events: auto;
 }
 
 .dialogue-overlay.hidden {
@@ -927,6 +1073,147 @@ html, body {
   margin-top: 1.2rem;
 }
 
+/* ---------- Settings Overlay ---------- */
+.settings-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+
+.settings-overlay.hidden {
+  display: none;
+}
+
+.settings-panel {
+  width: min(90vw, 480px);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-glow);
+  box-shadow: var(--glow-cyan);
+  padding: 1.5rem 1.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.8rem;
+}
+
+.settings-header h3 {
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  background: var(--bg-panel-light);
+  border: 1px solid var(--border-subtle);
+  transition: border-color var(--speed-fast);
+}
+
+.settings-item:hover {
+  border-color: var(--border-glow);
+}
+
+.settings-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.settings-label {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.settings-desc {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.settings-footer {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.8rem;
+  text-align: right;
+}
+
+.settings-status {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--bg-panel-light);
+  border: 1px solid var(--border-subtle);
+  transition: var(--speed-fast);
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-secondary);
+  transition: var(--speed-fast);
+}
+
+input:checked + .slider {
+  background-color: rgba(0, 240, 255, 0.15);
+  border-color: var(--neon-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+input:checked + .slider::before {
+  transform: translateX(24px);
+  background-color: var(--neon-cyan);
+}
+
+input:focus + .slider {
+  outline: 1px solid var(--neon-cyan);
+}
+
 /* ---------- AI Thinking Animation ---------- */
 .ai-thinking {
   position: absolute;
@@ -1037,6 +1324,8 @@ html, body {
   padding: 0.6rem 1rem;
   background: rgba(13, 13, 26, 0.8);
   border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 21; /* 高于 top-bar(20)，确保按钮可点击 */
 }
 
 .selector-label {
@@ -1067,6 +1356,17 @@ html, body {
 }
 
 /* 审讯动作按钮区 */
+/* 审讯操作引导 */
+.interrogation-guide {
+  padding: 0.5rem 0.8rem;
+  margin-bottom: 0.5rem;
+}
+.guide-tip {
+  font-size: 0.75rem;
+  color: var(--neon-cyan);
+  opacity: 0.8;
+}
+
 .interrogation-actions {
   position: absolute;
   bottom: 4.5rem; /* 对话框上方 */

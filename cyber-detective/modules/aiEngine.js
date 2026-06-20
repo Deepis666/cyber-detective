@@ -10,14 +10,17 @@
 import { getEmotion, getStress, getDialogueHistory as getStateHistory, getState, addDialogueToHistory, addStress, addScore, setFlag, addEvidence } from './gameState.js';
 
 // ====================
-// AI 配置
+// AI 配置（兼容 DeepSeek / OpenAI 格式）
 // ====================
 const AI_CONFIG = {
-  apiUrl: import.meta.env.VITE_HUNYUAN_API_URL || 'https://api.hunyuan.cloud.tencent.com/v1/chat/completions',
+  apiUrl: import.meta.env.VITE_HUNYUAN_API_URL || 'https://api.deepseek.com/v1/chat/completions',
   apiKey: import.meta.env.VITE_HUNYUAN_API_KEY || '',
-  model: 'hunyuan-lite',
+  // 推荐模型：
+  //   deepseek-chat   = DeepSeek V3（效果最优，推荐）
+  //   deepseek-reasoner = DeepSeek R1（深度推理，但响应慢一些）
+  model: 'deepseek-chat',
   maxRetries: 2,
-  timeout: 12000
+  timeout: 15000
 };
 
 // ====================
@@ -26,6 +29,7 @@ const AI_CONFIG = {
 let _charactersData = null;
 let _evidenceData = null;
 let _caseData = null;
+let _aiEnabled = true; // AI 开关状态（由设置面板控制）
 
 /**
  * 初始化 AI 引擎（注入游戏数据）
@@ -55,8 +59,25 @@ export function setAIEngineCaseContext(caseData) {
  * @returns {boolean}
  */
 export function isAPIAvailable() {
-  return !!AI_CONFIG.apiKey;
+  return _aiEnabled && !!AI_CONFIG.apiKey;
 }
+
+/**
+ * 设置 AI 开关
+ * @param {boolean} enabled
+ */
+export function setAIEnabled(enabled) {
+  _aiEnabled = enabled;
+}
+
+/**
+ * 获取当前 AI 开关状态
+ * @returns {boolean}
+ */
+export function isAIEnabled() {
+  return _aiEnabled;
+}
+
 
 // ====================
 // 离线模式预设回应
@@ -121,6 +142,22 @@ const PRESET_RESPONSES = {
     // ===== 案件2：数据深渊 =====
     suspect_201: {
       calm: [
+        { response: "蜂巢是钱总的私人AI助手，我负责日常维护和升级。它只是一个高级日程管理系统，没有什么特别的数据。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
+        { response: "钱总关闭外部访问后，蜂巢进入休眠模式。我只保留了本地维护权限，没有任何数据操作。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
+        { response: "我和钱总的关系？工作关系。他是个好老板，技术要求高但尊重专业人士。仅此而已。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null }
+      ],
+      nervous: [
+        { response: "迁移数据？我只是执行钱总的……执行标准的系统维护操作。关闭外部访问后，本地备份是标准流程。", emotion: "nervous", stressDelta: 8, hasContradiction: true, newClue: "唐芸否认数据迁移的特殊性" },
+        { response: "钱总和我……我们的关系很专业。他信任我的技术能力，我也尊重他的领导风格。没有更多了。", emotion: "nervous", stressDelta: 10, hasContradiction: true, newClue: null },
+        { response: "保险箱？我不知道什么保险箱。钱总的个人物品我不了解，我只管蜂巢系统。", emotion: "nervous", stressDelta: 6, hasContradiction: true, newClue: null }
+      ],
+      broken: [
+        { response: "……钱总给我留了一道加密指令。如果他在48小时内没有重新开放蜂巢权限，就把核心数据迁移到指定的物理保险箱。我执行了。他知道自己可能回不来了。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "唐芸承认执行钱致远的加密迁移指令" },
+        { response: "他不只是我的老板。最后那条通讯……他说'小芸，对不起，连累你了。记住，数据比人重要。'……他知道自己要死了，还在想着保护证据。我怎么能让他白死？", emotion: "broken", stressDelta: -8, hasContradiction: true, newClue: "唐芸与钱致远有私人感情" }
+      ]
+    },
+    suspect_202: {
+      calm: [
         { response: "我那晚在46层办公室处理季度报告，门禁记录可以证明。47层的数据中心不在我的职责巡视范围内。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
         { response: "钱总是个优秀的同事。我们之间没有私交，但互相尊重。他的数据安全权限是他独立负责的领域。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
         { response: "机房的物理接口柜？每个数据中心都有。那是系统维护用的标准配置，没有任何特殊之处。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
@@ -138,7 +175,7 @@ const PRESET_RESPONSES = {
         { response: "蓝屏病毒……是我写的。三行代码，通过物理接口注入，绕过所有防火墙。钱致远连痛苦都没有感觉到——至少这点，我尽了力。", emotion: "broken", stressDelta: -8, hasContradiction: true, newClue: "方明辉承认制造并注入蓝屏病毒" }
       ]
     },
-    suspect_202: {
+    suspect_203: {
       calm: [
         { response: "4分钟的安保盲区是系统负载过高导致的临时故障。数据中心的监控系统压力一直是全楼最大的，我已经提交了故障报告。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
         { response: "我的工作是确保安保系统正常运行。出了故障，我负责修复，不是负责为故障辩护。你还有其他问题吗？", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
@@ -154,24 +191,24 @@ const PRESET_RESPONSES = {
         { response: "U盘是我放的。我在钱总死后查了系统日志，发现蜂巢在死前被强制迁移了数据。我把最后的备份拷了下来……我知道这样做违反规定，但那是钱总最后的痕迹。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "刘小薇承认故意留下蜂巢U盘" }
       ]
     },
-    suspect_203: {
-      calm: [
-        { response: "蜂巢是钱总的私人AI助手，我负责日常维护和升级。它只是一个高级日程管理系统，没有什么特别的数据。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
-        { response: "钱总关闭外部访问后，蜂巢进入休眠模式。我只保留了本地维护权限，没有任何数据操作。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
-        { response: "我和钱总的关系？工作关系。他是个好老板，技术要求高但尊重专业人士。仅此而已。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null }
-      ],
-      nervous: [
-        { response: "迁移数据？我只是执行钱总的……执行标准的系统维护操作。关闭外部访问后，本地备份是标准流程。", emotion: "nervous", stressDelta: 8, hasContradiction: true, newClue: "唐芸否认数据迁移的特殊性" },
-        { response: "钱总和我……我们的关系很专业。他信任我的技术能力，我也尊重他的领导风格。没有更多了。", emotion: "nervous", stressDelta: 10, hasContradiction: true, newClue: null },
-        { response: "保险箱？我不知道什么保险箱。钱总的个人物品我不了解，我只管蜂巢系统。", emotion: "nervous", stressDelta: 6, hasContradiction: true, newClue: null }
-      ],
-      broken: [
-        { response: "……钱总给我留了一道加密指令。如果他在48小时内没有重新开放蜂巢权限，就把核心数据迁移到指定的物理保险箱。我执行了。他知道自己可能回不来了。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "唐芸承认执行钱致远的加密迁移指令" },
-        { response: "他不只是我的老板。最后那条通讯……他说'小芸，对不起，连累你了。记住，数据比人重要。'……他知道自己要死了，还在想着保护证据。我怎么能让他白死？", emotion: "broken", stressDelta: -8, hasContradiction: true, newClue: "唐芸与钱致远有私人感情" }
-      ]
-    },
     // ===== 案件3：义体战争 =====
     suspect_301: {
+      calm: [
+        { response: "孙婉清就是我。我帮下城区的诊所对接正规供应商，做的是合法采购代理。手续费不高，图个安稳。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
+        { response: "马三的诊所？我帮他采购过一些常规耗材，民用级别的消毒液、缝合线之类。量不大，月均一两单。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
+        { response: "控制模块？我是做采购的，不是做技术的。零件买来什么样就是什么样，我只管走账。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null }
+      ],
+      nervous: [
+        { response: "特供零件？我不太明白你在说什么。马三的订单里没有标注'特供'的条目，你可以查采购记录。", emotion: "nervous", stressDelta: 8, hasContradiction: true, newClue: "孙婉清否认经手特供零件" },
+        { response: "周铁手……我听说过，锐义科技的顾问。但我没有跟他直接合作过。我只是个中间人，不是供应链经理。", emotion: "nervous", stressDelta: 10, hasContradiction: true, newClue: null },
+        { response: "模块兼容性测试……那只是供应商要求的标准质检流程，确保零件与常见义体系统兼容。没有特殊含义。", emotion: "nervous", stressDelta: 12, hasContradiction: true, newClue: "孙婉清声称模块测试是标准流程" }
+      ],
+      broken: [
+        { response: "好吧，我经手过那批零件。周铁手提供货源，我负责伪装成合法采购运到马三那里。运费按单结算，每单抽15%。但你以为我有选择吗？周铁手那种人，说不合作就真的不会跟你商量第二次。", emotion: "broken", stressDelta: -5, hasContradiction: true, newClue: "孙婉清承认是周铁手和马三的中间人" },
+        { response: "我知道零件里有'额外功能'。激活频率校准？是，我帮周铁手确认过模块与中继器的频率匹配。但我从没亲眼见过模块被激活……直到暴走事件发生后，我才意识到那些'额外功能'到底是什么。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "孙婉清承认知道隐藏模块并参与频率校准" }
+      ]
+    },
+    suspect_302: {
       calm: [
         { response: "周铁手是我，铁手的铁，铁手的手。我在锐义科技做外部顾问，负责渠道对接，合法生意。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
         { response: "马三？听说是下城区一个黑市义体师。我这种人不会去下城区，我的办公室在尖塔区。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
@@ -188,7 +225,7 @@ const PRESET_RESPONSES = {
         { response: "……是我激活的。远程激活他义体里的控制模块，让他的脑干过载关机。很简单，按一个键的事。创世纪需要干净的供应链，马三是个污染源，必须清除。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "周铁手承认远程激活杀死马三" }
       ]
     },
-    suspect_302: {
+    suspect_303: {
       calm: [
         { response: "我、我就是马师傅的帮工，打杂的。搬搬东西、消消毒，不太懂技术。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
         { response: "诊所的零件都是马师傅自己进的货，我、我只管搬到冰柜里。从不过问来源，也不敢问。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
@@ -202,22 +239,6 @@ const PRESET_RESPONSES = {
       broken: [
         { response: "好吧……好吧我全说。暴走之前三天，有个手是铁的人来找马师傅，他们在密室吵了一架。马师傅说'零件有鬼，你得加钱'，那人走了以后马师傅就让我把出货记录藏到B4层。他说……他说要是他出事了，就把记录交给下城区的线人。", emotion: "broken", stressDelta: -8, hasContradiction: true, newClue: "阿七目击马三与周铁手争吵" },
         { response: "马师傅是唯一对我好的人……他教我认字、教我修义体、给我饭吃。他不该死的……那些零件有问题是真的人家不知道吗？我不信。他们就是不管下城区的人死活……", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "阿七透露马三知道零件有问题" }
-      ]
-    },
-    suspect_303: {
-      calm: [
-        { response: "孙婉清就是我。我帮下城区的诊所对接正规供应商，做的是合法采购代理。手续费不高，图个安稳。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
-        { response: "马三的诊所？我帮他采购过一些常规耗材，民用级别的消毒液、缝合线之类。量不大，月均一两单。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null },
-        { response: "控制模块？我是做采购的，不是做技术的。零件买来什么样就是什么样，我只管走账。", emotion: "calm", stressDelta: 0, hasContradiction: false, newClue: null }
-      ],
-      nervous: [
-        { response: "特供零件？我不太明白你在说什么。马三的订单里没有标注'特供'的条目，你可以查采购记录。", emotion: "nervous", stressDelta: 8, hasContradiction: true, newClue: "孙婉清否认经手特供零件" },
-        { response: "周铁手……我听说过，锐义科技的顾问。但我没有跟他直接合作过。我只是个中间人，不是供应链经理。", emotion: "nervous", stressDelta: 10, hasContradiction: true, newClue: null },
-        { response: "模块兼容性测试……那只是供应商要求的标准质检流程，确保零件与常见义体系统兼容。没有特殊含义。", emotion: "nervous", stressDelta: 12, hasContradiction: true, newClue: "孙婉清声称模块测试是标准流程" }
-      ],
-      broken: [
-        { response: "好吧，我经手过那批零件。周铁手提供货源，我负责伪装成合法采购运到马三那里。运费按单结算，每单抽15%。但你以为我有选择吗？周铁手那种人，说不合作就真的不会跟你商量第二次。", emotion: "broken", stressDelta: -5, hasContradiction: true, newClue: "孙婉清承认是周铁手和马三的中间人" },
-        { response: "我知道零件里有'额外功能'。激活频率校准？是，我帮周铁手确认过模块与中继器的频率匹配。但我从没亲眼见过模块被激活……直到暴走事件发生后，我才意识到那些'额外功能'到底是什么。", emotion: "broken", stressDelta: -10, hasContradiction: true, newClue: "孙婉清承认知道隐藏模块并参与频率校准" }
       ]
     },
     // ===== 案件4：最后的真相 =====
@@ -327,6 +348,11 @@ async function loadPrompt(templateName, variables) {
  * @returns {Promise<Object|null>} 解析后的 JSON 响应，失败返回 null
  */
 async function callAPI(prompt, history = []) {
+  if (!_aiEnabled) {
+    console.warn('[aiEngine] AI 对话已关闭，使用离线模式');
+    return null;
+  }
+
   if (!AI_CONFIG.apiKey) {
     console.warn('[aiEngine] API Key 未配置，使用离线模式');
     return null;

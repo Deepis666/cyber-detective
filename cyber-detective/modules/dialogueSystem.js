@@ -18,6 +18,9 @@ let _elements = {};
 let _typewriterTimer = null;
 let _typewriterResolve = null;
 let _isTyping = false;
+let _currentFullText = '';
+let _continueResolve = null;
+let _isDialogueBusy = false;  // 对话进行中标志（防止审讯按钮在开场白期间被触发）
 
 // 角色名称映射（由外部注入）
 let _speakerNameMap = {};
@@ -38,9 +41,27 @@ export function initDialogueSystem() {
     optionsContainer: document.getElementById('options-container')
   };
 
-  // 点击对话框或指示器推进对话
-  _elements.overlay.addEventListener('click', _handleDialogueClick);
-  _elements.indicator.addEventListener('click', _handleDialogueClick);
+  // 点击对话框区域推进对话/跳过打字机（注册在 dialogue-box 而非 overlay，因 overlay 设为 pointer-events:none）
+  const dialogueBox = _elements.overlay.querySelector('.dialogue-box');
+  if (dialogueBox) {
+    dialogueBox.addEventListener('click', _handleAdvance);
+  }
+  // 点击 indicator 也推进
+  if (_elements.indicator) {
+    _elements.indicator.addEventListener('click', _handleAdvance);
+  }
+
+  // 键盘支持：空格/回车推进对话
+  document.addEventListener('keydown', (e) => {
+    // 仅在对话框可见时响应
+    if (_elements.overlay.classList.contains('hidden')) return;
+    // 选项面板有内容时不拦截（让玩家点选项）
+    if (_elements.optionsContainer.children.length > 0) return;
+    if (e.code === 'Space' || e.code === 'Enter') {
+      e.preventDefault();
+      _handleAdvance();
+    }
+  });
 
   console.log('[dialogueSystem] 对话系统初始化完成');
 }
@@ -64,13 +85,15 @@ export function initDialogueSystem() {
 export function showDialogue(dialogue, options = {}) {
   const {
     typewriter = true,
-    typewriterSpeed = 30
+    typewriterSpeed = 30,
+    waitForClick = true   // 默认打字完成后等待玩家点击再 resolve
   } = options;
 
   return new Promise((resolve) => {
     // 显示对话框
     _elements.overlay.classList.remove('hidden');
     _elements.optionsContainer.innerHTML = '';
+    _isDialogueBusy = true;
 
     // 设置说话者名称
     _setSpeakerName(dialogue.speaker, dialogue.emotion);
@@ -84,13 +107,29 @@ export function showDialogue(dialogue, options = {}) {
     // 隐藏指示器（打字过程中）
     _elements.indicator.style.display = 'none';
 
+    // 打字完成后的回调：等待玩家点击再 resolve
+    const onTypewriterDone = () => {
+      if (waitForClick) {
+        // 等待玩家点击/按键推进
+        _continueResolve = () => {
+          _elements.indicator.style.display = 'none';
+          _continueResolve = null;
+          _isDialogueBusy = false;
+          resolve();
+        };
+        _elements.indicator.style.display = 'block';
+      } else {
+        _isDialogueBusy = false;
+        resolve();
+      }
+    };
+
     if (typewriter && dialogue.text) {
-      _typewriterResolve = resolve;
+      _typewriterResolve = onTypewriterDone;
       _startTypewriter(dialogue.text, typewriterSpeed);
     } else {
       _elements.dialogueText.textContent = dialogue.text || '';
-      _elements.indicator.style.display = 'block';
-      resolve();
+      onTypewriterDone();
     }
 
     // 记录到对话历史
@@ -107,9 +146,8 @@ export function showDialogue(dialogue, options = {}) {
  */
 export async function showDialogueSequence(dialogues, options = {}) {
   for (const dialogue of dialogues) {
+    // showDialogue 已内置 waitForClick，打字完成后等待玩家点击再 resolve
     await showDialogue(dialogue, options);
-    // 等待玩家点击继续
-    await _waitForContinue();
   }
 }
 
@@ -124,23 +162,31 @@ export async function showDialogueSequence(dialogues, options = {}) {
  */
 export function showOptions(options) {
   return new Promise((resolve) => {
+    console.log(`[DEBUG] showOptions: 开始, options数量=${options.length}, overlay.hidden=${_elements.overlay.classList.contains('hidden')}`);
     _elements.optionsContainer.innerHTML = '';
+
+    // 显示对话框覆盖层（确保选项可见可点击）
+    _elements.overlay.classList.remove('hidden');
 
     // 隐藏继续指示器
     _elements.indicator.style.display = 'none';
+    _isDialogueBusy = true;
 
     options.forEach((option, index) => {
       const btn = document.createElement('button');
       btn.className = 'option-btn';
       btn.textContent = option.text;
       btn.dataset.index = index;
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        console.log(`[DEBUG] showOptions: 选项被点击, option=`, option);
         // 添加选中动画
         btn.style.borderColor = 'var(--neon-magenta)';
         btn.style.background = 'rgba(255, 0, 229, 0.1)';
 
         // 清空选项容器
         _elements.optionsContainer.innerHTML = '';
+        // 注意：不在此处清除 _isDialogueBusy，由后续 showDialogue 或调用方管理
 
         // 记录玩家选择
         addDialogueToHistory('user', option.text);
@@ -182,7 +228,34 @@ export function clearDialogue() {
  */
 export function hideDialogueOverlay() {
   _elements.overlay.classList.add('hidden');
+  _isDialogueBusy = false;
   clearDialogue();
+}
+
+/**
+ * 重置对话系统状态（清理残留的 resolve 回调和打字机）
+ * 用于场景切换时强制中断未完成的对话
+ */
+export function resetDialogueState() {
+  _stopTypewriter();
+  _isTyping = false;
+  _typewriterResolve = null;
+  _currentFullText = '';
+  _isDialogueBusy = false;
+  if (_continueResolve) {
+    const r = _continueResolve;
+    _continueResolve = null;
+    r();
+  }
+  clearDialogue();
+}
+
+/**
+ * 检查对话是否正在进行中（用于防止审讯按钮在开场白期间被触发）
+ * @returns {boolean}
+ */
+export function isDialogueBusy() {
+  return _isDialogueBusy;
 }
 
 /**
@@ -234,6 +307,7 @@ function _setSpeakerName(speaker, emotion) {
 function _startTypewriter(text, speed) {
   _stopTypewriter();
   _isTyping = true;
+  _currentFullText = text;
   _elements.dialogueText.textContent = '';
 
   let charIndex = 0;
@@ -261,40 +335,56 @@ function _stopTypewriter() {
 }
 
 /**
- * 处理对话框点击（推进对话/跳过打字机）
+ * 统一处理对话推进（点击/键盘）
+ * - 打字中：跳过打字，显示完整文本
+ * - 等待继续：resolve _continueResolve 推进下一条
  */
-function _handleDialogueClick(e) {
-  // 如果正在打字，点击则完成打字
+function _handleAdvance(e) {
+  console.log(`[DEBUG] _handleAdvance: 被调用, _isTyping=${_isTyping}, _continueResolve=${!!_continueResolve}, optionsChildren=${_elements.optionsContainer.children.length}`);
+
+  // 确保不是点击选项按钮
+  if (e && e.target && e.target.closest('.option-btn')) {
+    console.log('[DEBUG] _handleAdvance: 点击的是选项按钮，跳过');
+    return;
+  }
+
+  // 选项面板有内容时（showOptions 正在等待选择），不推进/隐藏对话框
+  if (_elements.optionsContainer.children.length > 0) {
+    console.log('[DEBUG] _handleAdvance: 选项面板有内容，跳过');
+    return;
+  }
+
   if (_isTyping) {
+    // 跳过打字机：显示完整文本
     _stopTypewriter();
-    // 显示完整文本
-    // (文本已在 _currentFullText 中，但我们需从外部获取)
+    _elements.dialogueText.textContent = _currentFullText;
     _elements.indicator.style.display = 'block';
     if (_typewriterResolve) {
       _typewriterResolve();
       _typewriterResolve = null;
     }
-    e.stopPropagation();
     return;
+  }
+
+  // 非打字状态：推进到下一条对话
+  if (_continueResolve) {
+    _elements.indicator.style.display = 'none';
+    const r = _continueResolve;
+    _continueResolve = null;
+    r();
+  } else {
+    // 无后续对话：隐藏对话框，不阻挡场景交互
+    hideDialogueOverlay();
   }
 }
 
 /**
- * 等待玩家点击继续
+ * 等待玩家点击/按键继续
  */
 function _waitForContinue() {
   return new Promise((resolve) => {
-    const handler = (e) => {
-      // 确保不是点击选项按钮
-      if (e.target.closest('.option-btn')) return;
-
-      _elements.overlay.removeEventListener('click', handler);
-
-      // 清空当前对话文本，准备下一条
-      resolve();
-    };
-
-    _elements.overlay.addEventListener('click', handler);
+    _continueResolve = resolve;
+    _elements.indicator.style.display = 'block';
   });
 }
 

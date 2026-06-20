@@ -1,0 +1,125 @@
+{
+  "evidence": [
+    {
+      "id": "evidence_001",
+      "name": "陈老九的账本",
+      "icon": "assets/ui/evidence_ledger.png",
+      "description": "一本手写账本，记录了陈老九近3个月的义体交易明细。其中多处提到405室赵铁柱，包括一笔5000信用点的义肢维护费和一笔未结清的3000信用点借款。",
+      "type": "physical",
+      "obtainedFrom": "scene_desk",
+      "canCombineWith": ["evidence_004"],
+      "relatedTo": ["suspect_002"]
+    },
+    {
+      "id": "evidence_002",
+      "name": "监控记录碎片",
+      "icon": "assets/ui/evidence_camera.png",
+      "description": "公寓走廊监控的一段破损数据片段。经技术还原，显示案发当晚凌晨2:15，一个与林小北身形相似的人影从404室方向匆匆离开，并非其所称的一直在工坊。",
+      "type": "digital",
+      "obtainedFrom": "scene_corridor",
+      "canCombineWith": ["evidence_003"],
+      "relatedTo": ["suspect_001"]
+    },
+    {
+      "id": "evidence_003",
+      "name": "生物科技公司密函",
+      "icon": "assets/ui/evidence_letter.png",
+      "description": "一封加密通讯记录，发件人为大型生物科技公司'新人类集团'安全部，收件人代号'北星'。内容提到：'陈老九已察觉实验数据外泄，建议启动清除计划'。",
+      "type": "digital",
+      "obtainedFrom": "scene_body",
+      "canCombineWith": ["evidence_002"],
+      "relatedTo": ["suspect_001", "suspect_003"]
+    },
+    {
+      "id": "evidence_004",
+      "name": "破损的数据芯片",
+      "icon": "assets/ui/evidence_chip.png",
+      "description": "在死者工坊角落发现的被砸毁数据芯片。经修复发现是死者的加密日记，其中一条写道：'小北最近不对劲，他在偷我的配方数据。今天我在他包底发现了新人类的工牌。'日期是案发前3天。",
+      "type": "physical",
+      "obtainedFrom": "scene_workshop",
+      "canCombineWith": ["evidence_001", "evidence_005"],
+      "relatedTo": ["suspect_001"]
+    },
+    {
+      "id": "evidence_005",
+      "name": "电磁脉冲注射器",
+      "icon": "assets/ui/evidence_injector.png",
+      "description": "在案发现场床底发现的改装医疗器械。注射器针头有被暴力弯折痕迹，上面残留陈老九的DNA和林小北的指纹。注射器内置的电磁脉冲模块为军用级别，非民用市场可获取——与新人类集团的供应链吻合。",
+      "type": "physical",
+      "obtainedFrom": "scene_body",
+      "canCombineWith": ["evidence_003", "evidence_004"],
+      "relatedTo": ["suspect_001"]
+    }
+        ,
+    {
+      "id": "evidence_010",
+      "name": "加密通话记录",
+      "icon": "assets/ui/evidence_phone.png",
+      "description": "锐义科技内部加密通话记录修复片段。案发前 2 小时，周海伦与一名匿名联系人通话 3 分钟，话题为'47 层的事情处理干净了没有'。联系人回应'已远程注入过载信号'。",
+      "type": "digital",
+      "obtainedFrom": "scene_case002_office",
+      "canCombineWith": ["evidence_011", "evidence_012"],
+      "relatedTo": ["suspect_004"]
+    },
+    {
+      "id": "evidence_011",
+      "name": "陈明远的加密求助日志",
+      "icon": "assets/ui/evidence_log.png",
+      "description": "死者电脑中恢复的加密日志。最后一篇记录：'周已经怀疑我了。我把交易数据库密钥备份后发给了马克，希望他能看懂我的暗示。如果明天我没有出现在发布会，请打开我发给你的那个文件。'",
+      "type": "digital",
+      "obtainedFrom": "scene_case002_office",
+      "canCombineWith": ["evidence_010"],
+      "relatedTo": ["suspect_004", "suspect_005"]
+    },
+    {
+      "id": "evidence_012",
+      "name": "交易数据库密钥",
+      "icon": "assets/ui/evidence_keychip.png",
+      "description": "一枚加密芯片，内含锐义科技 5 年的非法脑机数据交易记录。芯片上残留马克·李的指纹。解密的交易记录显示周海伦亲自签署了超过 200 笔向黑市出售用户数据的授权。",
+      "type": "physical",
+      "obtainedFrom": "scene_case002_datacenter",
+      "canCombineWith": ["evidence_010", "evidence_013"],
+      "relatedTo": ["suspect_004", "suspect_005"]
+    },
+    {
+      "id": "evidence_013",
+      "name": "记者义眼录像",
+      "icon": "assets/ui/evidence_eye.png",
+      "description": "艾琳·赵的义眼自动录制的最后一段画面。视频中陈明远在案发前一天秘密约见艾琳，将交易数据库密钥交给她并说'这是我最后的保险'。但视频末尾，周海伦的私人无人机出现在背景中。",
+      "type": "digital",
+      "obtainedFrom": "scene_case002_analysis",
+      "canCombineWith": ["evidence_012"],
+      "relatedTo": ["suspect_004", "suspect_006"]
+    },
+    {
+      "id": "evidence_016",
+      "name": "流浪者登记名册",
+      "icon": "assets/ui/evidence_roster.png",
+      "description": "在地下车库暗格中找到的手写名册。记录了 47 名下城区流浪者的个人信息，每一条后面都标注'已转运'和日期。笔迹经鉴定为顾明慧本人。最后一条记录日期是案发前 3 天。",
+      "type": "physical",
+      "obtainedFrom": "scene_case003_lab",
+      "canCombineWith": ["evidence_017"],
+      "relatedTo": ["suspect_007"]
+    },
+    {
+      "id": "evidence_017",
+      "name": "军用义体供应清单",
+      "icon": "assets/ui/evidence_list.png",
+      "description": "赛博格科技给顾振邦的私人供应清单，上面列出了 3 套'CN-7 神经战斗义体'——一款明确被国际公约禁止民用市场使用的军用产品。石井·马克斯的签名位于每页下方。",
+      "type": "physical",
+      "obtainedFrom": "scene_case003_mansion",
+      "canCombineWith": ["evidence_016"],
+      "relatedTo": ["suspect_008"]
+    },
+    {
+      "id": "evidence_018",
+      "name": "手术台上的血字",
+      "icon": "assets/ui/evidence_blood.png",
+      "description": "现场机械臂所在手术台上，用血潦草写下的信息：'第 47 号实验体阿鬼，这不是你的名字，这是给你的编号'。此外还有后半行被抹去的字迹：'我来拿回属于我们的——'。字迹不是死者的。",
+      "type": "physical",
+      "obtainedFrom": "scene_case003_lab",
+      "canCombineWith": ["evidence_016"],
+      "relatedTo": ["suspect_009"]
+    }
+  ]
+}

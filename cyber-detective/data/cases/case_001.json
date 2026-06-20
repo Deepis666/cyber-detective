@@ -65,17 +65,17 @@
   },
   "endings": {
     "ending_good": {
-      "condition": "score >= 80",
+      "condition": "score >= 120",
       "title": "真相大白",
       "description": "你成功揭穿了林小北的真面目。作为新人类集团安插的卧底，他在身份暴露后选择了极端手段。证据链完整地呈现在法庭上，新人类集团的非法实验也随之曝光。陈老九的冤魂终于得以安息。"
     },
     "ending_normal": {
-      "condition": "score >= 40",
+      "condition": "score >= 60",
       "title": "疑案悬置",
       "description": "你掌握了部分真相，但关键证据的缺失让最终裁定含糊不清。林小北被释放，但他的眼神里从此多了一层挥之不去的恐惧。这桩案件被归档为'证据不足'，沉入了下城区警局的冷案库。"
     },
     "ending_bad": {
-      "condition": "score < 40",
+      "condition": "score < 60",
       "title": "错判冤案",
       "description": "在压力不足、证据链断裂的情况下，你做出了错误的裁定。真正的凶手逍遥法外，而一个无辜者背负了罪名。霓虹公寓的灯光依旧闪烁，但正义，又一次缺席了。"
     }
