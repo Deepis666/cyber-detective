@@ -611,7 +611,7 @@ html, body {
 }
 
 .character-panel {
-  width: 40%;
+  width: 35%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -810,9 +810,74 @@ html, body {
 }
 
 .interrogation-panel {
-  width: 60%;
+  width: 45%;
   position: relative;
   padding-top: 3.5rem; /* 避开 top-bar 绝对定位的遮挡 */
+}
+
+/* ---------- Suspect Bio Panel ---------- */
+.suspect-bio-panel {
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.03) 0%, transparent 100%);
+  border-left: 1px solid var(--border-subtle);
+  padding: 4rem 0.8rem 1rem;
+  overflow-y: auto;
+}
+
+.bio-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--neon-cyan);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-glow);
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.bio-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.bio-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.bio-label {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.bio-secret-label {
+  color: var(--neon-red);
+}
+
+.bio-value {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.bio-text {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.bio-text-secret {
+  color: var(--text-dim);
+  font-style: italic;
+  font-size: 0.72rem;
 }
 
 /* ---------- Ending Screen ---------- */
@@ -1310,6 +1375,7 @@ input:focus + .slider {
   .interrogation-layout { flex-direction: column; }
   .character-panel { width: 100%; height: 40%; border-right: none; border-bottom: 1px solid var(--border-subtle); }
   .interrogation-panel { width: 100%; }
+  .suspect-bio-panel { width: 100%; max-height: 30vh; border-left: none; border-top: 1px solid var(--border-subtle); }
   .character-img { max-height: 30vh; }
   .evidence-list { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
 }

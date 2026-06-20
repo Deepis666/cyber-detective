@@ -326,6 +326,9 @@ export async function renderInterrogationScene(suspect) {
   // 渲染嫌疑人选择器
   _renderSuspectSelector(suspect.id);
 
+  // 刷新嫌疑人档案面板
+  _renderSuspectBio(suspect);
+
   // await 开场对话，确保完成后玩家才能操作
   console.log(`[DEBUG] renderInterrogationScene: 开始播放开场白`);
   await _playInterrogationOpening(suspect.id);
@@ -348,6 +351,35 @@ function _renderSuspectSelector(currentSuspectId) {
     btn.dataset.action = 'switch-suspect';
     selectorEl.appendChild(btn);
   });
+}
+
+/**
+ * 渲染嫌疑人档案面板（右侧）
+ * @param {Object} suspect - 嫌疑人数据对象
+ */
+function _renderSuspectBio(suspect) {
+  const nameEl = document.getElementById('bio-name');
+  const identityEl = document.getElementById('bio-identity');
+  const personalityEl = document.getElementById('bio-personality');
+  const secretEl = document.getElementById('bio-secret');
+  if (!nameEl) return;
+
+  nameEl.textContent = suspect.name || '—';
+  identityEl.textContent = suspect.identity || '—';
+
+  if (suspect.personality) {
+    personalityEl.textContent = suspect.personality.replace(/[。；]/g, '。\n').split('\n').slice(0, 3).join('\n');
+  } else {
+    personalityEl.textContent = '—';
+  }
+
+  if (suspect.secretKnowledge) {
+    secretEl.textContent = '证据充足时可解锁机密信息';
+    secretEl.style.color = 'var(--text-dim)';
+    secretEl.style.fontStyle = 'italic';
+  } else {
+    secretEl.textContent = '—';
+  }
 }
 
 async function _playInterrogationOpening(suspectId) {
@@ -870,6 +902,17 @@ function _updateStressDisplay(suspectId) {
     const contradictionLevel = Math.min(4, Math.floor(stress / 25));
     contradictionEl.textContent = '█'.repeat(contradictionLevel) + '░'.repeat(4 - contradictionLevel);
     contradictionEl.className = `psych-metric-value contradiction-${contradictionLevel}`;
+  }
+
+  // 嫌疑人崩溃时解锁机密档案
+  const secretEl = document.getElementById('bio-secret');
+  if (secretEl && stress >= 70) {
+    const suspect = _caseData?.suspects?.find(s => s.id === suspectId);
+    if (suspect?.secretKnowledge) {
+      secretEl.textContent = suspect.secretKnowledge;
+      secretEl.style.color = 'var(--neon-yellow)';
+      secretEl.style.fontStyle = 'normal';
+    }
   }
 }
 
