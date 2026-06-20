@@ -1,0 +1,114 @@
+{
+  "characters": [
+    {
+      "id": "suspect_001",
+      "name": "林小北",
+      "identity": "死者助手",
+      "portrait": "assets/characters/suspect_001.png",
+      "profile": "25岁，跟随陈老九学习义体技术3年。表面忠厚老实，实际上是某大型生物科技公司的卧底，被派来监视陈老九的地下实验。",
+      "personality": "内向谨慎，说话吞吞吐吐，但偶尔会露出冷静到可怕的一面。",
+      "secretKnowledge": "知道陈老九所有地下交易的细节，且与锐义科技有秘密联系。",
+      "lies": [
+        { "topic": "案发时间", "lieText": "我当晚在修理义肢，一直在工坊没离开过...", "truthText": "案发当晚他离开过工坊，监控有记录", "counterEvidence": "evidence_002" },
+        { "topic": "与死者的关系", "lieText": "老师对我很好，我们从来没有闹过矛盾", "truthText": "死者生前发现他是卧底，两人大吵一架", "counterEvidence": "evidence_004" }
+      ]
+    },
+    {
+      "id": "suspect_002",
+      "name": "赵铁柱",
+      "identity": "死者邻居·汽修工人",
+      "portrait": "assets/characters/suspect_002.png",
+      "profile": "42岁，住在霓虹公寓405室，隔壁。左臂为二手战斗义肢，传闻曾在黑帮当过打手。与陈老九有过金钱纠纷。",
+      "personality": "暴躁冲动，嗓门大，但内心有自己的一套江湖道义。",
+      "secretKnowledge": "知道霓虹公寓地下黑市交易网络的运作方式。",
+      "lies": [
+        { "topic": "是否认识死者", "lieText": "就住隔壁，见过几面，不熟", "truthText": "他曾在死者处多次维修义肢，并有金钱来往", "counterEvidence": "evidence_001" }
+      ]
+    },
+    {
+      "id": "suspect_003",
+      "name": "钱一鸣",
+      "identity": "黑市中间人·酒吧老板",
+      "portrait": "assets/characters/suspect_003.png",
+      "profile": "45岁，男，下城区「零号酒吧」老板。专门牵线黑市义体买卖，陈老九是他最重要的供应商。死者最近试图绕开他直接与客户交易。",
+      "personality": "八面玲珑，见人说人话见鬼说鬼话，笑容下藏着刀。",
+      "secretKnowledge": "掌握下城区黑市交易的完整网络和人员名单。",
+      "lies": [
+        { "topic": "与死者的交易", "lieText": "我和老陈只是普通的生意往来，没什么特别的", "truthText": "死者是他的核心供应商，分成纠纷导致关系破裂", "counterEvidence": "evidence_003" }
+      ]
+    },
+    {
+      "id": "suspect_004",
+      "name": "周海伦",
+      "identity": "锐义科技CEO",
+      "portrait": "assets/characters/suspect_004.png",
+      "profile": "52岁，女，锐义科技创始人兼CEO，新香港商界铁娘子。表面上推动脑机科技普惠化，暗中将用户数据卖给黑市和政客。死者发现了她的秘密，必须在曝光前解决。",
+      "personality": "外表优雅从容、谈吐滴水不漏，实则冷酷无情，视人命如数据流。",
+      "secretKnowledge": "主导了长达5年的非法数据交易网络，与上城区多名议员有利益输送。",
+      "lies": [
+        { "topic": "案发时间不在场", "lieText": "当晚我在顶楼开董事会，全程有会议记录", "truthText": "董事会提前结束，她独自回到47层", "counterEvidence": "evidence_010" },
+        { "topic": "与死者的关系", "lieText": "陈明远是我最信任的下属，我们情同战友", "truthText": "死者生前已准备举报她，两人决裂", "counterEvidence": "evidence_012" }
+      ]
+    },
+    {
+      "id": "suspect_005",
+      "name": "马克·李",
+      "identity": "锐义科技首席程序员",
+      "portrait": "assets/characters/suspect_005.png",
+      "profile": "29岁，男，天才神经接口工程师，华裔混血。5年前被锐义科技从大学挖走，负责核心数据加密系统。性格内向，只信任代码。死者死前最后一条信息发给了他。",
+      "personality": "社交恐惧，说话结巴但涉及技术时语速极快，对代码有宗教般的信仰。",
+      "secretKnowledge": "他写的加密系统有一个自己留的后门，能绕过所有安全协议。",
+      "lies": [
+        { "topic": "死者最后的求助", "lieText": "他没联系过我，我什么都不知道", "truthText": "死者发给他一条加密信息：帮我解开数据封锁，有人在销毁证据", "counterEvidence": "evidence_011" }
+      ]
+    },
+    {
+      "id": "suspect_006",
+      "name": "艾琳·赵",
+      "identity": "独立调查记者",
+      "portrait": "assets/characters/suspect_006.png",
+      "profile": "35岁，女，地下媒体「新香港之声」创始人。用义眼记录一切，多次揭露企业黑幕遭到死亡威胁。死者是她最重要的线人，约定案发次日见面。",
+      "personality": "正义感爆棚，不畏权势但不信任任何人，说话带刺但句句真话。",
+      "secretKnowledge": "她手中已有锐义科技非法交易的70%证据链，只差最后一块拼图。",
+      "lies": [
+        { "topic": "是否知道数据内容", "lieText": "老陈只说有重要信息，没告诉我具体是什么", "truthText": "她已掌握锐义科技的数据交易网络全貌，缺的只是交易密码", "counterEvidence": "evidence_013" }
+      ]
+    },
+    {
+      "id": "suspect_007",
+      "name": "顾明慧",
+      "identity": "顾振邦之妻·慈善基金会主席",
+      "portrait": "assets/characters/suspect_007.png",
+      "profile": "55岁，女，出身豪门，以上城区慈善活动闻名。表面悲痛欲绝，实际上对丈夫的实验早已知情，在丈夫死后立即接管了义体移植项目的资金链。",
+      "personality": "温柔外表下极度精明，每句话都在关心你实则刺探底线。",
+      "secretKnowledge": "她知道丈夫所有秘密，甚至参与筛选实验对象。",
+      "lies": [
+        { "topic": "是否知道实验室", "lieText": "我完全不知道振邦在地下做这些……我太震惊了", "truthText": "她不仅是知情者，还负责物色低收入区的流浪者作为实验体", "counterEvidence": "evidence_016" }
+      ]
+    },
+    {
+      "id": "suspect_008",
+      "name": "石井·马克斯",
+      "identity": "赛博格科技公司CEO·义体制造商",
+      "portrait": "assets/characters/suspect_008.png",
+      "profile": "45岁，男，日德混血，全球最大义体制造商「赛博格科技」亚太区CEO。与顾振邦有深度合作，为非法实验提供最顶级的军用级义体。",
+      "personality": "商业精英做派，西装革履下的身体已90%义体化，信奉技术即进化。",
+      "secretKnowledge": "知道实验非法但不在乎，唯一的恐惧是供应链暴露。",
+      "lies": [
+        { "topic": "与死者的合作", "lieText": "顾议员只是我们的客户之一，购买标准民用产品", "truthText": "他私下向顾提供了3套禁止民用市场的军用级神经战斗义体", "counterEvidence": "evidence_017" }
+      ]
+    },
+    {
+      "id": "suspect_009",
+      "name": "阿鬼",
+      "identity": "地下义体解放组织成员·前实验体",
+      "portrait": "assets/characters/suspect_009.png",
+      "profile": "26岁，性别不详，曾是下城区流浪者，被顾振邦实验室绑架并强制植入全身义体。在手术过程中反向黑入系统，操控机械臂杀死顾振邦后逃走。",
+      "personality": "沉默寡言，身体大部分已被义体覆盖，声音经过合成器发出。对富人阶级有根深蒂固的仇恨，但对同为流浪者的人表现出罕见的温柔。",
+      "secretKnowledge": "知道顾振邦实验室的全部运作流程和受害者名单。",
+      "lies": [
+        { "topic": "案发当晚的行踪", "lieText": "我在下城区和同伴在一起", "truthText": "当晚正在实验室手术台上，亲手操控机械臂完成了复仇", "counterEvidence": "evidence_018" }
+      ]
+    }
+  ]
+}
